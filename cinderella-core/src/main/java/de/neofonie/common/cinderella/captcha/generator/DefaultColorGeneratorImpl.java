@@ -3,9 +3,6 @@ package de.neofonie.common.cinderella.captcha.generator;
 import java.awt.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Created by paasch on 11.04.16.
- */
 public class DefaultColorGeneratorImpl implements ColorGenerator {
 
     private final float minSaturation;

@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Created by paasch on 05.04.16.
- */
 @Service
 public class CinderellaFilter implements Filter {
 

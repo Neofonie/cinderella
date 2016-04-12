@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cinderellaXmlConfig xmlns="http://www.neofonie.de/xsd/cinderella.xsd"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://www.neofonie.de/xsd/cinderella.xsd xsd/cinderella.xsd"
+                     blacklistMinutes="60" whitelistMinutes="0">
+    <rules>
+        <rule id="id" identifierType="IP" requests="1" minutes="1">
+            <requestPath>foo</requestPath>
+            <requestPath>bar</requestPath>
+            <and>
+                <requestPath>
+
+                </requestPath>
+            </and>
+        </rule>
+    </rules>
+</cinderellaXmlConfig>

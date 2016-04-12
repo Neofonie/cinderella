@@ -5,9 +5,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-/**
- * Created by paasch on 06.04.16.
- */
 public class MemoryCounter implements Counter {
 
     private final FixedTimeMap<String, CounterData> counterMap = new FixedTimeMap<>();

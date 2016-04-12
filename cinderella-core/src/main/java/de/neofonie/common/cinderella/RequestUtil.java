@@ -3,9 +3,6 @@ package de.neofonie.common.cinderella;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-/**
- * Created by paasch on 06.04.16.
- */
 public final class RequestUtil {
 
     private RequestUtil() {

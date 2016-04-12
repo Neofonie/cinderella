@@ -5,7 +5,7 @@ import de.neofonie.common.cinderella.RequestUtil;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Matches, if user has a session
+ * Checks if the user has a session.
  */
 public class Session implements Condition {
 

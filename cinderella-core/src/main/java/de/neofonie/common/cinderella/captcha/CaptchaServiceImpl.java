@@ -12,9 +12,6 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-/**
- * Created by paasch on 07.04.16.
- */
 public class CaptchaServiceImpl implements CaptchaService {
 
     public static final String SESSION_ATTRIBUTE = "CAPTCHA";

@@ -2,9 +2,6 @@ package de.neofonie.common.cinderella.counter;
 
 import java.util.Date;
 
-/**
- * Created by paasch on 11.04.16.
- */
 public class StatisticEntry {
 
     private final String key;

@@ -2,9 +2,6 @@ package de.neofonie.common.cinderella.counter;
 
 import java.util.List;
 
-/**
- * Created by paasch on 11.04.16.
- */
 public class Statistic {
 
     private final List<StatisticEntry> counter;

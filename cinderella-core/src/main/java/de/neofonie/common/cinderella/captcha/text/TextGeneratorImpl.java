@@ -2,9 +2,6 @@ package de.neofonie.common.cinderella.captcha.text;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Created by paasch on 07.04.16.
- */
 public class TextGeneratorImpl implements TextGenerator {
 
     private static final String CHARS = "BCDFGHJKLMNPQRSTVWXYZ";

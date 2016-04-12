@@ -2,9 +2,6 @@ package de.neofonie.common.cinderella.counter;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by paasch on 05.04.16.
- */
 public interface Counter {
 
     boolean isDdos(String key, long requests, TimeUnit timeUnit, long duration);

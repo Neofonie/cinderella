@@ -9,9 +9,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Created by paasch on 07.04.16.
- */
 public class CaptchaGeneratorImpl implements CaptchaGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(CaptchaGeneratorImpl.class);

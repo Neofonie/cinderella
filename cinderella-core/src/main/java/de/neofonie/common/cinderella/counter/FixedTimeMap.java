@@ -11,9 +11,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
-/**
- * Created by paasch on 11.04.16.
- */
 class FixedTimeMap<K, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(FixedTimeMap.class);

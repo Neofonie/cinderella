@@ -14,9 +14,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by paasch on 05.04.16.
- */
 public class CinderellaServiceImpl implements CinderellaService {
 
     private static final Logger logger = LoggerFactory.getLogger(CinderellaServiceImpl.class);
