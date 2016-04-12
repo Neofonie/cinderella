@@ -99,7 +99,9 @@ class FixedTimeMap<K, V> {
 
         private boolean isRemove() {
             long currentTimeMillis = System.currentTimeMillis();
-            logger.info(String.format("isRemove %d > %d", currentTimeMillis, endTime.longValue()));
+            if (logger.isDebugEnabled()) {
+                logger.debug(String.format("isRemove %d > %d", currentTimeMillis, endTime.longValue()));
+            }
             return currentTimeMillis > endTime.longValue();
         }
 

@@ -28,7 +28,7 @@ public class CinderellaFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        logger.info("check ddos");
+        logger.debug("check ddos");
         if (!(req instanceof HttpServletRequest) || !(response instanceof HttpServletResponse)) {
             chain.doFilter(req, response);
             return;
@@ -46,8 +46,9 @@ public class CinderellaFilter implements Filter {
         }
         if (!cinderellaService.isDdos(request)) {
             chain.doFilter(request, response);
+            return;
         }
-        logger.debug("ddos-check");
+        logger.info(String.format("suspicious request %s", request.getRequestURI()));
         request.getRequestDispatcher(ddosJsp).include(request, response);
     }
 

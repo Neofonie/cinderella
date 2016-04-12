@@ -4,15 +4,13 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <import resource="classpath*:spring-cinderella-common-config.xml"/>
+
     <bean id="cinderellaFilter" class="de.neofonie.common.cinderella.CinderellaFilter"
           p:ddosJsp="/WEB-INF/jsp/cinderella.jsp"/>
-    <bean id="cinderellaService" class="de.neofonie.common.cinderella.CinderellaServiceImpl"/>
     <bean id="cinderellaXmlConfigLoader"
           class="de.neofonie.common.cinderella.config.loader.CinderellaXmlConfigLoaderFactory"
           p:xmlConfigPath="classpath:cinderellaConfig.xml"/>
     <bean id="cinderellaMemoryCounter" class="de.neofonie.common.cinderella.counter.MemoryCounter"/>
-    <bean id="captchaService" class="de.neofonie.common.cinderella.captcha.CaptchaServiceImpl"/>
-    <bean id="textGenerator" class="de.neofonie.common.cinderella.captcha.text.TextGeneratorImpl"/>
-    <bean id="captchaGenerator" class="de.neofonie.common.cinderella.captcha.generator.CaptchaGeneratorImpl"/>
 
 </beans>
