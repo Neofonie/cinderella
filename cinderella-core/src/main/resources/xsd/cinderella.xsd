@@ -44,6 +44,7 @@
                 <xs:element name="and" type="cinderella:and"/>
                 <xs:element name="or" type="cinderella:or"/>
                 <xs:element name="session" type="cinderella:session"/>
+                <xs:element name="ip" type="cinderella:ipCondition"/>
             </xs:choice>
         </xs:sequence>
     </xs:complexType>
@@ -82,6 +83,10 @@
         </xs:annotation>
         <xs:sequence/>
     </xs:complexType>
+
+    <xs:simpleType name="ipCondition">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
 
     <xs:complexType name="rule">
         <xs:annotation>

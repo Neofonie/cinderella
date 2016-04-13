@@ -16,7 +16,8 @@ public abstract class ConditionList {
             @XmlElement(name = "requestPath", type = RequestPath.class),
             @XmlElement(name = "and", type = And.class),
             @XmlElement(name = "or", type = Or.class),
-            @XmlElement(name = "session", type = Session.class)
+            @XmlElement(name = "session", type = Session.class),
+            @XmlElement(name = "ip", type = IpCondition.class)
     })
     private List<Condition> conditions;
 

@@ -1,4 +1,4 @@
-package de.neofonie.common.cinderella.config;
+package de.neofonie.common.cinderella.config.util;
 
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;

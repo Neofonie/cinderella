@@ -1,6 +1,6 @@
 package de.neofonie.common.cinderella.config.xml.condition;
 
-import de.neofonie.common.cinderella.config.PatternTypeAdapter;
+import de.neofonie.common.cinderella.config.util.PatternTypeAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
