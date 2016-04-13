@@ -33,6 +33,9 @@ public class CinderellaServiceImpl implements CinderellaService {
                 return true;
             }
             CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+            if (cinderellaConfig == null) {
+                return false;
+            }
             List<Rule> matches = cinderellaConfig.getMatches(request);
             for (Rule rule : matches) {
                 String key = rule.getIdentifierType().getIdentifier(request) + '_' + rule.getId();
@@ -81,6 +84,9 @@ public class CinderellaServiceImpl implements CinderellaService {
 
         try {
             CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+            if (cinderellaConfig == null) {
+                return;
+            }
             counter.whitelist(identifier, TimeUnit.MINUTES, cinderellaConfig.getWhitelistMinutes());
         } catch (IOException e) {
             logger.error("", e);

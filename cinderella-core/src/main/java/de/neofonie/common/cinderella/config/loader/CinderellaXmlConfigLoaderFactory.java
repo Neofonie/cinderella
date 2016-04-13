@@ -13,9 +13,7 @@ import org.xml.sax.SAXException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -137,6 +135,12 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
             logger.debug("load");
             JAXBContext jc = JAXBContext.newInstance(CinderellaXmlConfig.CLASSES);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
+            unmarshaller.setEventHandler(new ValidationEventHandler() {
+                @Override
+                public boolean handleEvent(ValidationEvent event) {
+                    return false;
+                }
+            });
 
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             InputStream schemaInputStream = CinderellaXmlConfigLoaderFactory.class.getClassLoader().getResourceAsStream("xsd/cinderella.xsd");
