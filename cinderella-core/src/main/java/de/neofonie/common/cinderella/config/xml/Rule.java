@@ -1,5 +1,6 @@
 package de.neofonie.common.cinderella.config.xml;
 
+import de.neofonie.common.cinderella.config.xml.condition.AndCondition;
 import de.neofonie.common.cinderella.config.xml.condition.Condition;
 import de.neofonie.common.cinderella.config.xml.condition.ConditionList;
 
@@ -47,13 +48,7 @@ public class Rule extends ConditionList implements Condition {
         if (!identifierType.accept(request)) {
             return false;
         }
-        for (Condition condition : getConditions()) {
-            boolean matches = condition.matches(request);
-            if (!matches) {
-                return false;
-            }
-        }
-        return true;
+        return AndCondition.allMatches(request, getConditions());
     }
 
     public String getId() {

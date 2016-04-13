@@ -1,7 +1,7 @@
 package de.neofonie.common.cinderella.config.xml;
 
 import de.neofonie.common.cinderella.config.CinderellaConfig;
-import de.neofonie.common.cinderella.config.xml.condition.Condition;
+import de.neofonie.common.cinderella.config.xml.condition.OrCondition;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -35,8 +35,12 @@ public class CinderellaXmlConfig implements CinderellaConfig {
         return rules;
     }
 
-    public void setRules(List<Rule> rules) {
+    void setRules(List<Rule> rules) {
         this.rules = rules;
+    }
+
+    void setWhitelist(Whitelist whitelist) {
+        this.whitelist = whitelist;
     }
 
     @Override
@@ -51,14 +55,13 @@ public class CinderellaXmlConfig implements CinderellaConfig {
 
     @Override
     public List<Rule> getMatches(HttpServletRequest httpServletRequest) {
-        if (whitelist != null) {
-            for (Condition condition : whitelist.getConditions()) {
-                if (condition.matches(httpServletRequest)) {
-                    return Collections.emptyList();
-                }
-            }
+        if (whitelist != null && OrCondition.anyMatches(httpServletRequest, whitelist.getConditions())) {
+            return Collections.emptyList();
         }
 
+        if (rules == null) {
+            return Collections.emptyList();
+        }
         return rules
                 .stream()
                 .filter(rule -> rule.matches(httpServletRequest))

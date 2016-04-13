@@ -14,8 +14,8 @@ public abstract class ConditionList {
     @Valid
     @XmlElements(value = {
             @XmlElement(name = "requestPath", type = RequestPath.class),
-            @XmlElement(name = "and", type = And.class),
-            @XmlElement(name = "or", type = Or.class),
+            @XmlElement(name = "and", type = AndCondition.class),
+            @XmlElement(name = "or", type = OrCondition.class),
             @XmlElement(name = "session", type = Session.class),
             @XmlElement(name = "ip", type = IpCondition.class)
     })
@@ -29,6 +29,10 @@ public abstract class ConditionList {
     }
 
     public List<Condition> getConditions() {
-        return Collections.unmodifiableList(conditions);
+        return conditions == null ? Collections.emptyList() : Collections.unmodifiableList(conditions);
+    }
+
+    void setConditions(List<Condition> conditions) {
+        this.conditions = conditions;
     }
 }
