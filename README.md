@@ -13,25 +13,15 @@ If a bad request is found, the client could enter a captcha to confirm him as a 
 
 There is a full runable example under https://github.com/Neofonie/cinderella/tree/master/cinderella-example
 
-1. Check it out via 
-    
-```
-git clone https://github.com/Neofonie/cinderella.git
-```
-    
-2. buid it with maven
-
-```
-mvn clean install
-```
-    
+1. Check it out via ```git clone https://github.com/Neofonie/cinderella.git```
+2. buid it with maven ```mvn clean install```
 3. now under cinderella-example/target/ is a cinderella-example-*.war file which can be deployed at every Servlet-Container.
 
 ### From scratch
 
-1. add a mvn dependency 
+#### add a mvn dependency
 
-```
+```XML
 <dependency>
   <groupId>de.neofonie.common.cinderella</groupId>
   <artifactId>cinderella-core</artifactId>
@@ -39,9 +29,9 @@ mvn clean install
 </dependency>
 ```
     
-2. add filter to web.xml
+#### add filter to web.xml
 
-```
+```XML
 <filter>
     <filter-name>cinderellaFilter</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -52,12 +42,12 @@ mvn clean install
 </filter-mapping>
 ```
 
-3. add spring-beans to application-config
+#### add spring-beans to application-config
 
 add following entries to your a application-config. 
 Its always directly located under WEB-INF, but the name differs depending what name you have configured. 
 
-```
+```XML
 <import resource="classpath*:spring-cinderella-common-config.xml"/>
 
 <bean id="cinderellaFilter" class="de.neofonie.common.cinderella.CinderellaFilter"
@@ -68,26 +58,26 @@ Its always directly located under WEB-INF, but the name differs depending what n
 <bean id="cinderellaMemoryCounter" class="de.neofonie.common.cinderella.counter.MemoryCounter"/>
 ```
 
-4. Create a cinderella.jsp under /jsp/cinderella.jsp
+#### Create a cinderella.jsp under /jsp/cinderella.jsp
 
 Create a jsp which would be shown if a request would be abandon. If you dont like the path, you could change it in the application-config.
 
 If you want the user to verify him as human, put the following html-fragment inside the jsp.
 
-```
+```HTML
 <form action="${requestUrl}">
     <img src="jcaptcha.png"/> <input type="text" name="captcha" value=""/>
     <input type="submit"/>
 </form>
 ```
 
-5. Create a rules-config
+#### Create a rules-config
 
 Create a cinderellaConfig.xml inside the resource folder.
 
 Here is an example, which can be used for the first run. But this should be adjusted for production-use. 
 
-```
+```XML
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cinderellaXmlConfig xmlns="http://www.neofonie.de/xsd/cinderella.xsd"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -108,7 +98,7 @@ Here is an example, which can be used for the first run. But this should be adju
 </cinderellaXmlConfig>
 ```
 
-6. Summary
+#### Summary
 
 Now you should have added or modified following files (additional to your project-files).
 
@@ -121,7 +111,7 @@ Now you should have added or modified following files (additional to your projec
         └── webapp
             └── WEB-INF
                 ├── jsp
-                │   ├── cinderella.jsp
+                │   └── cinderella.jsp
                 ├── spring-servlet.xml (name can differ)
                 └── web.xml
 ```
@@ -141,7 +131,7 @@ On this site, its possible to enter a captcha, with what the IP/Sessionid will b
 
 The rules-file could be stored in the classpath or everywhere else in the filesystem. The location must be set in the cinderellaXmlConfigLoader.
 
-```
+```XML
 <bean id="cinderellaXmlConfigLoader"
    class="de.neofonie.common.cinderella.config.loader.CinderellaXmlConfigLoaderFactory"
    p:xmlConfigPath="classpath:cinderellaConfig.xml"/>
@@ -158,7 +148,7 @@ The rules config contains currently 3 parts.
 * a list of conditions, which should be ever whitelisted (that should contain google-IPs, Client-Names, ...)
 * a list of rules
 
-```
+```XML
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cinderellaXmlConfig xmlns="http://www.neofonie.de/xsd/cinderella.xsd"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -175,7 +165,7 @@ The rules config contains currently 3 parts.
 
 ### Rule 
 
-```
+```XML
 <rule id="ip" identifierType="IP" requests="3" minutes="5">
     <session session="false"/>
 </rule>
@@ -196,6 +186,6 @@ If the request doesnt contain a SessionId, these rules will be ignored.
 
 for Details, look at [cinderella.xsd](https://raw.githubusercontent.com/Neofonie/cinderella/master/cinderella-core/src/main/resources/xsd/cinderella.xsd)
  
- ### Whitelist
+### Whitelist
  
 Here the same conditions as for Rules can be used. 
