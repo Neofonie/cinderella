@@ -1,6 +1,8 @@
 package de.neofonie.common.cinderella.config.xml.condition;
 
 import javax.validation.Valid;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import java.util.Collections;
@@ -9,6 +11,7 @@ import java.util.List;
 /**
  * abstract class containing a list of conditions
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ConditionList {
 
     @Valid
@@ -22,10 +25,10 @@ public abstract class ConditionList {
     })
     private List<Condition> conditions;
 
-    protected ConditionList() {
+    public ConditionList() {
     }
 
-    protected ConditionList(List<Condition> conditions) {
+    public ConditionList(List<Condition> conditions) {
         this.conditions = conditions;
     }
 
@@ -33,7 +36,14 @@ public abstract class ConditionList {
         return conditions == null ? Collections.emptyList() : Collections.unmodifiableList(conditions);
     }
 
-    void setConditions(List<Condition> conditions) {
+    public void setConditions(List<Condition> conditions) {
         this.conditions = conditions;
+    }
+
+    @Override
+    public String toString() {
+        return "ConditionList{" +
+                "conditions=" + conditions +
+                '}';
     }
 }

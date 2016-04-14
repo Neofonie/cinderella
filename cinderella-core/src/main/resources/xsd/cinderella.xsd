@@ -25,7 +25,7 @@
     <xs:complexType name="whitelist">
         <xs:annotation>
             <xs:documentation>
-                <![CDATA[A list of Conditions. If at least one condition matches, the request will be ignored for ddos-scanning. The List is also equal to {@link de.neofonie.common.cinderella.config.xml.condition.Or}.]]></xs:documentation>
+                <![CDATA[A list of Conditions. If at least one condition matches, the request will be ignored for ddos-scanning. The List is also equal to {@link de.neofonie.common.cinderella.config.xml.condition.OrCondition}.]]></xs:documentation>
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="cinderella:conditionList">
@@ -41,10 +41,11 @@
         <xs:sequence>
             <xs:choice maxOccurs="unbounded" minOccurs="0">
                 <xs:element ref="cinderella:requestPath"/>
-                <xs:element name="and" type="cinderella:and"/>
-                <xs:element name="or" type="cinderella:or"/>
+                <xs:element name="and" type="cinderella:andCondition"/>
+                <xs:element name="or" type="cinderella:orCondition"/>
                 <xs:element name="session" type="cinderella:session"/>
                 <xs:element name="ip" type="cinderella:ipCondition"/>
+                <xs:element name="header" type="cinderella:requestHeaderCondition"/>
             </xs:choice>
         </xs:sequence>
     </xs:complexType>
@@ -53,7 +54,7 @@
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
 
-    <xs:complexType name="and">
+    <xs:complexType name="andCondition">
         <xs:annotation>
             <xs:documentation>
                 <![CDATA[matches if all condition matches. If empty, it ever matches.]]></xs:documentation>
@@ -65,7 +66,7 @@
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:complexType name="or">
+    <xs:complexType name="orCondition">
         <xs:annotation>
             <xs:documentation>
                 <![CDATA[matches if any condition matches. If empty, it never matches.]]></xs:documentation>
@@ -82,11 +83,19 @@
             <xs:documentation><![CDATA[Checks if the user has a session.]]></xs:documentation>
         </xs:annotation>
         <xs:sequence/>
+        <xs:attribute name="session" type="xs:boolean" use="required"/>
     </xs:complexType>
 
     <xs:simpleType name="ipCondition">
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+
+    <xs:complexType name="requestHeaderCondition">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="name" type="xs:string"/>
+            <xs:element minOccurs="0" name="value" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="rule">
         <xs:annotation>

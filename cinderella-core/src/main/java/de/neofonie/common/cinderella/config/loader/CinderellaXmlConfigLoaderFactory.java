@@ -148,6 +148,7 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
             unmarshaller.setSchema(schema);
 
             CinderellaXmlConfig ddosXmlConfig = (CinderellaXmlConfig) unmarshaller.unmarshal(inputStream);
+            ddosXmlConfig.validate();
 
             logger.info("loaded " + ddosXmlConfig);
             Set<ConstraintViolation<CinderellaXmlConfig>> violations = validator.validate(ddosXmlConfig);
@@ -161,7 +162,7 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
                     .collect(Collectors.joining("\n"));
             logger.error(String.format("Error loading %s:%s", xmlConfigPath, message));
             return null;
-        } catch (SAXException | JAXBException e) {
+        } catch (SAXException | JAXBException | IllegalArgumentException e) {
             logger.error(String.format("Error loading %s", xmlConfigPath), e);
             return null;
         }

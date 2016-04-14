@@ -35,6 +35,14 @@ public class RequestPath implements Condition {
         return regex.matcher(request.getRequestURI()).find();
     }
 
+    public Pattern getRegex() {
+        return regex;
+    }
+
+    public void setRegex(Pattern regex) {
+        this.regex = regex;
+    }
+
     @Override
     public String toString() {
         return "RequestPath{" +

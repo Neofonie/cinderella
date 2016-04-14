@@ -9,9 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class IpCondition implements Condition {
 
     private static final Logger logger = LoggerFactory.getLogger(IpCondition.class);
@@ -35,7 +38,18 @@ public class IpCondition implements Condition {
         }
     }
 
-    void setIpAddressRange(IpAddressRange ipAddressRange) {
+    public IpAddressRange getIpAddressRange() {
+        return ipAddressRange;
+    }
+
+    public void setIpAddressRange(IpAddressRange ipAddressRange) {
         this.ipAddressRange = ipAddressRange;
+    }
+
+    @Override
+    public String toString() {
+        return "IpCondition{" +
+                "ipAddressRange=" + ipAddressRange +
+                '}';
     }
 }

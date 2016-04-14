@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -76,5 +78,15 @@ public class CinderellaXmlConfig implements CinderellaConfig {
     @Override
     public long getWhitelistMinutes() {
         return whitelistMinutes;
+    }
+
+    public void validate() {
+
+        Set<String> ids = new HashSet<>();
+        for (Rule rule : rules) {
+            if (!ids.add(rule.getId())) {
+                throw new IllegalArgumentException(String.format("Duplicate Id '%s' occured", rule.getId()));
+            }
+        }
     }
 }

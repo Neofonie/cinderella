@@ -8,8 +8,11 @@
         <requestPath>^/whitelist$</requestPath>
     </whitelist>
     <rules>
-        <rule id="test" identifierType="IP" requests="5" minutes="5">
-            <requestPath>^/</requestPath>
+        <rule id="ip" identifierType="IP" requests="3" minutes="5">
+            <session session="false"/>
+        </rule>
+        <rule id="session" identifierType="SESSION" requests="7" minutes="5">
+            <session session="true"/>
         </rule>
     </rules>
 </cinderellaXmlConfig>
