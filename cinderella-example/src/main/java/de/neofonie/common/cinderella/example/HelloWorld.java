@@ -1,7 +1,7 @@
 package de.neofonie.common.cinderella.example;
 
-import de.neofonie.common.cinderella.RequestUtil;
-import de.neofonie.common.cinderella.counter.MemoryCounter;
+import de.neofonie.cinderella.core.RequestUtil;
+import de.neofonie.cinderella.core.counter.MemoryCounter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

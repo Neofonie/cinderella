@@ -25,7 +25,7 @@
     <xs:complexType name="whitelist">
         <xs:annotation>
             <xs:documentation>
-                <![CDATA[A list of Conditions. If at least one condition matches, the request will be ignored for ddos-scanning. The List is also equal to {@link de.neofonie.common.cinderella.config.xml.condition.OrCondition}.]]></xs:documentation>
+                <![CDATA[A list of Conditions. If at least one condition matches, the request will be ignored for ddos-scanning. The List is also equal to {@link de.neofonie.cinderella.core.config.xml.condition.OrCondition}.]]></xs:documentation>
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="cinderella:conditionList">

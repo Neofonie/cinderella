@@ -23,7 +23,7 @@ There is a full runable example under https://github.com/Neofonie/cinderella/tre
 
 ```XML
 <dependency>
-  <groupId>de.neofonie.common.cinderella</groupId>
+  <groupId>de.neofonie.cinderella</groupId>
   <artifactId>cinderella-core</artifactId>
   <version>${project.version}</version>
 </dependency>
@@ -50,12 +50,12 @@ Its always directly located under WEB-INF, but the name differs depending what n
 ```XML
 <import resource="classpath*:spring-cinderella-common-config.xml"/>
 
-<bean id="cinderellaFilter" class="de.neofonie.common.cinderella.CinderellaFilter"
+<bean id="cinderellaFilter" class="de.neofonie.cinderella.core.CinderellaFilter"
       p:ddosJsp="/WEB-INF/jsp/cinderella.jsp"/>
 <bean id="cinderellaXmlConfigLoader"
-      class="de.neofonie.common.cinderella.config.loader.CinderellaXmlConfigLoaderFactory"
+      class="de.neofonie.cinderella.core.config.loader.CinderellaXmlConfigLoaderFactory"
       p:xmlConfigPath="classpath:cinderellaConfig.xml"/>
-<bean id="cinderellaMemoryCounter" class="de.neofonie.common.cinderella.counter.MemoryCounter"/>
+<bean id="cinderellaMemoryCounter" class="de.neofonie.cinderella.core.counter.MemoryCounter"/>
 ```
 
 #### Create a cinderella.jsp under /jsp/cinderella.jsp
@@ -133,7 +133,7 @@ The rules-file could be stored in the classpath or everywhere else in the filesy
 
 ```XML
 <bean id="cinderellaXmlConfigLoader"
-   class="de.neofonie.common.cinderella.config.loader.CinderellaXmlConfigLoaderFactory"
+   class="de.neofonie.cinderella.core.config.loader.CinderellaXmlConfigLoaderFactory"
    p:xmlConfigPath="classpath:cinderellaConfig.xml"/>
 ```
 
