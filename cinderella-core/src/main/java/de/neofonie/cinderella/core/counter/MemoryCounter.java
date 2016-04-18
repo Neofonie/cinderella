@@ -12,7 +12,7 @@ public class MemoryCounter implements Counter {
     private final FixedTimeMap<String, Long> whitelistMap = new FixedTimeMap<>();
 
     @Override
-    public boolean isDdos(String key, long requests, TimeUnit timeUnit, long duration) {
+    public boolean checkCount(String key, long requests, TimeUnit timeUnit, long duration) {
         long count = counterMap
                 .getOrCreate(key, k -> new CounterData(), timeUnit, duration)
                 .isDdos(timeUnit, duration);
@@ -34,6 +34,7 @@ public class MemoryCounter implements Counter {
         whitelistMap.getOrCreate(key, s -> 1L, timeUnit, duration);
     }
 
+    @Override
     public boolean isWhitelisted(String key) {
         return whitelistMap.get(key) != null;
     }

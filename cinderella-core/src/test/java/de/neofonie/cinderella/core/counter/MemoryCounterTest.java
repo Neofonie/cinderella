@@ -15,16 +15,16 @@ public class MemoryCounterTest {
         final String KEY = "testDdos";
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
-        assertEquals(false, memoryCounter.isDdos(KEY, 1, TimeUnit.SECONDS, 1));
+        assertEquals(false, memoryCounter.checkCount(KEY, 1, TimeUnit.SECONDS, 1));
 
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
-        assertEquals(true, memoryCounter.isDdos(KEY, 1, TimeUnit.SECONDS, 1));
+        assertEquals(true, memoryCounter.checkCount(KEY, 1, TimeUnit.SECONDS, 1));
         doWait();
 
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
-        assertEquals(false, memoryCounter.isDdos(KEY, 1, TimeUnit.SECONDS, 1));
+        assertEquals(false, memoryCounter.checkCount(KEY, 1, TimeUnit.SECONDS, 1));
     }
 
     @Test

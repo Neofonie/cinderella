@@ -112,7 +112,7 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
         }
 
         @Override
-        public boolean isDdos(String key, long requests, TimeUnit timeUnit, long minutes) {
+        public boolean checkCount(String key, long requests, TimeUnit timeUnit, long minutes) {
             count++;
             diff += waittime;
             if (diff > minutes * 60 * 1000) {

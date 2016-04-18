@@ -189,3 +189,8 @@ for Details, look at [cinderella.xsd](https://raw.githubusercontent.com/Neofonie
 ### Whitelist
  
 Here the same conditions as for Rules can be used. 
+
+## Extension
+
+For production use, the datastore should be exchanged from an in-memory model to something else - for example a (NoSQL) DB or any distributed cache. 
+To do this, you must implement an own de.neofonie.cinderella.core.counter.Counter Service and declare this as spring-bean.

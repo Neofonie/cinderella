@@ -39,7 +39,7 @@ public class CinderellaServiceImpl implements CinderellaService {
             List<Rule> matches = cinderellaConfig.getMatches(request);
             for (Rule rule : matches) {
                 String key = rule.getIdentifierType().getIdentifier(request) + '_' + rule.getId();
-                boolean ddos = counter.isDdos(key, rule.getRequests(), TimeUnit.MINUTES, rule.getMinutes());
+                boolean ddos = counter.checkCount(key, rule.getRequests(), TimeUnit.MINUTES, rule.getMinutes());
                 if (ddos) {
                     counter.blacklist(key, TimeUnit.MINUTES, cinderellaConfig.getBlacklistMinutes());
                     return true;
