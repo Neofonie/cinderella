@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -117,8 +118,7 @@ public class CinderellaXmlConfigLoaderImplTest {
 
     private void copyFile(File file, String name) throws IOException {
         InputStream testXml = CinderellaXmlConfig.class.getClassLoader().getResourceAsStream(name);
-        file.delete();
-        Files.copy(testXml, file.toPath());
+        Files.copy(testXml, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
         logger.info("Copy " + name + " to " + file.getAbsolutePath());
     }
 
