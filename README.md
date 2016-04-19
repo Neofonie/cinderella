@@ -189,12 +189,12 @@ If the request doesnt contain a SessionId, these rules will be ignored.
 - requests: This amount of requests is allowed, but not more.
 - minutes: After this amount of minutes, the requests-Counter will be reseted.
 - The Rule themselve contains a list of conditions, these could be 
--- and
--- or
--- ip
--- requestPath
--- header
--- ... to be continued
+  - and
+  - or
+  - ip
+  - requestPath
+  - header
+  - ... to be continued
 
 for Details, look at [cinderella.xsd](https://raw.githubusercontent.com/Neofonie/cinderella/master/cinderella-core/src/main/resources/xsd/cinderella.xsd)
  
