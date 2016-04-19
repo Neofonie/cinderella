@@ -1,5 +1,7 @@
 # cinderella
 
+![travis-ci.org Build-Status](https://travis-ci.org/Neofonie/cinderella.svg?branch=master)
+
 cinderella is a java-framework to reject bad web-request (accordingly to the equal named fairy tale). 
 Its possible to define rules, which requests should be avoided and which not. 
 If a bad request is found, the client could enter a captcha to confirm him as a human user.
@@ -14,7 +16,7 @@ If a bad request is found, the client could enter a captcha to confirm him as a 
 There is a full runable example under https://github.com/Neofonie/cinderella/tree/master/cinderella-example
 
 1. Check it out via ```git clone https://github.com/Neofonie/cinderella.git```
-2. buid it with maven ```mvn clean install```
+2. build it with maven ```mvn clean install```
 3. now under cinderella-example/target/ is a cinderella-example-*.war file which can be deployed at every Servlet-Container.
 
 ### From scratch
@@ -194,3 +196,8 @@ Here the same conditions as for Rules can be used.
 
 For production use, the datastore should be exchanged from an in-memory model to something else - for example a (NoSQL) DB or any distributed cache. 
 To do this, you must implement an own de.neofonie.cinderella.core.counter.Counter Service and declare this as spring-bean.
+
+## Todo
+
+- Implement Counter for various storage systems
+- Statistic Overview to view the most frequently requests
