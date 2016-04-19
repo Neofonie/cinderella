@@ -25,6 +25,8 @@ package de.neofonie.cinderella.core.config.util;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.regex.Pattern;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -37,7 +39,8 @@ public class IpAddressTest {
         fail("'foo' is not a valid IP-Adress", "foo");
         fail("'1271.0.0.1' is not a valid IP-Adress", "1271.0.0.1");
         fail("'127.0.0.256' is not a valid IP-Adress", "127.0.0.256");
-        success("www.google.de/172.217.21.3", "www.google.de");
+        assertTrue(Pattern.compile("www.google.de/172.217.[0-9]+.[0-9]+").matcher(IpAddress.valueOf("www.google.de").toString()).matches());
+//        assertEquals(IpAddress.valueOf("www.google.de").toString(), "www.google.de/172.217.21.3");
         success("127.0.0.1", "127.0.0.1");
         success("127.0.0.255", "127.0.0.255");
 
