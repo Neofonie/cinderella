@@ -25,8 +25,6 @@ package de.neofonie.cinderella.core.config.util;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.regex.Pattern;
-
 import static org.testng.Assert.*;
 
 public class IpAddressRangeTest {
@@ -39,7 +37,6 @@ public class IpAddressRangeTest {
         fail("'foo' is not a valid IP-Range", "foo");
         fail("'1271.0.0.1' is not a valid IP-Range", "1271.0.0.1");
         fail("'127.0.0.256' is not a valid IP-Range", "127.0.0.256");
-        assertTrue(Pattern.compile("www.google.de/172.217.[0-9]+.[0-9]+").matcher(IpAddressRange.valueOf("www.google.de").toString()).matches());
 
         success("127.0.0.1-127.0.0.255", "127.0.0.1-127.0.0.255");
         success("127.0.0.255", "127.0.0.255");
@@ -53,7 +50,6 @@ public class IpAddressRangeTest {
         success("127.0.0.1", "::ffff:127.0.0.1");
 
         //Is this useful???
-        assertTrue(Pattern.compile("www.google.de/172.217.[0-9]+.[0-9]+-127.0.0.1").matcher(IpAddressRange.valueOf("www.google.de-127.0.0.1").toString()).matches());
         fail("'127.0.0.1-www.google.de' is not a valid IP-Range", "127.0.0.1-www.google.de");
 
         //Test mixed
