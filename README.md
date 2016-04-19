@@ -27,8 +27,18 @@ There is a full runable example under https://github.com/Neofonie/cinderella/tre
 <dependency>
   <groupId>de.neofonie.cinderella</groupId>
   <artifactId>cinderella-core</artifactId>
-  <version>${project.version}</version>
+  <version>1.0.0</version>
 </dependency>
+```
+
+#### add mvn repository
+```XML
+<repositories>
+    <repository>
+        <id>moeth-bintray</id>
+        <url>https://dl.bintray.com/moeth/maven/</url>
+    </repository>
+</repositories>
 ```
     
 #### add filter to web.xml
