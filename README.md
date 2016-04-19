@@ -31,12 +31,12 @@ There is a full runable example under https://github.com/Neofonie/cinderella/tre
 </dependency>
 ```
 
-#### add mvn repository
+#### add bintray mvn repository
 ```XML
 <repositories>
     <repository>
-        <id>moeth-bintray</id>
-        <url>https://dl.bintray.com/moeth/maven/</url>
+        <id>bintray</id>
+        <url>https://http://jcenter.bintray.com/</url>
     </repository>
 </repositories>
 ```
