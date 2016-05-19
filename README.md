@@ -8,7 +8,23 @@ If a bad request is found, the client could enter a captcha to confirm him as a 
  
 * The code is based on Spring-MVC and should work with everything based on this. 
 * The rules can be changed at compile time or at runtime (without restarting the application server)
- 
+
+Table of Contents
+=================
+
+  * [cinderella](#cinderella)
+    * [Getting started](#getting-started)
+      * [Example](#example)
+      * [From scratch](#from-scratch)
+    * [Way of working](#way-of-working)
+    * [Config-File](#config-file)
+      * [Location](#location)
+      * [Overview](#overview)
+      * [Rule](#rule)
+      * [Whitelist](#whitelist)
+    * [Extension](#extension)
+    * [Todo](#todo)
+
 ## Getting started
 
 ### Example
