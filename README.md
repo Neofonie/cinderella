@@ -210,6 +210,7 @@ If the request doesnt contain a SessionId, these rules will be ignored.
   - ip
   - requestPath
   - header
+  - session available
   - ... to be continued
 
 for Details, look at [cinderella.xsd](https://raw.githubusercontent.com/Neofonie/cinderella/master/cinderella-core/src/main/resources/xsd/cinderella.xsd)
