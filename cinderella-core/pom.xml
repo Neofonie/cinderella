@@ -128,7 +128,7 @@
                 </executions>
                 <configuration>
                     <sources>
-                        <source>src/main/java/de/neofonie/common/cinderella/config/xml/</source>
+                        <source>src/main/java/de/neofonie/cinderella/core/config/xml/</source>
                     </sources>
                     <outputDirectory>${project.basedir}/src/main/resources/xsd/</outputDirectory>
                     <transformSchemas>

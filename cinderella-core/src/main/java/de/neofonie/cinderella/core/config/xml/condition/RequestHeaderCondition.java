@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
@@ -36,9 +38,11 @@ import java.util.regex.Pattern;
 public class RequestHeaderCondition implements Condition {
 
     @NotNull
+    @XmlAttribute(required = true)
     private String name;
     @NotNull
     @XmlJavaTypeAdapter(PatternTypeAdapter.class)
+    @XmlValue
     private Pattern value;
 
     public RequestHeaderCondition() {

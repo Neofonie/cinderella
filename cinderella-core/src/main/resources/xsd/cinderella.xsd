@@ -1,26 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--
-  ~ /*
-  ~ The MIT License (MIT)
-  ~ Copyright (c) 2016 Neofonie GmbH
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
-  ~ of this software and associated documentation files (the "Software"), to deal
-  ~ in the Software without restriction, including without limitation the rights
-  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  ~ copies of the Software, and to permit persons to whom the Software is
-  ~ furnished to do so, subject to the following conditions:
-  ~ The above copyright notice and this permission notice shall be included in all
-  ~ copies or substantial portions of the Software.
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  ~ SOFTWARE.
-  ~  */
-  -->
-
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cinderella="http://www.neofonie.de/xsd/cinderella.xsd"
            attributeFormDefault="unqualified" elementFormDefault="qualified"
            targetNamespace="http://www.neofonie.de/xsd/cinderella.xsd" version="1.0">
@@ -95,7 +73,7 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="cinderella:conditionList">
-                <xs:sequence/>
+            <xs:sequence/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -113,10 +91,11 @@
     </xs:simpleType>
 
     <xs:complexType name="requestHeaderCondition">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="name" type="xs:string"/>
-            <xs:element minOccurs="0" name="value" type="xs:string"/>
-        </xs:sequence>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="rule">
@@ -139,8 +118,8 @@ The {@link id} must be unique for all rules. If the id for a rule is changed, th
 
     <xs:simpleType name="identifierType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="SESSION"/>
             <xs:enumeration value="IP"/>
+            <xs:enumeration value="SESSION"/>
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>

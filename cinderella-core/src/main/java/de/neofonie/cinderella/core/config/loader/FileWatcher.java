@@ -92,6 +92,7 @@ public class FileWatcher {
                 }
 
                 if (!key.reset()) {
+                    logger.error(String.format("Watching for %s is no longer possible", directory.getAbsolutePath()));
                     break; //loop
                 }
             }
