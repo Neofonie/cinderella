@@ -42,6 +42,7 @@ public class CinderellaFilter implements Filter {
     private CinderellaService cinderellaService;
     private CaptchaService captchaService;
     private String ddosJsp;
+    private int responseCode = 429;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -49,29 +50,31 @@ public class CinderellaFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
         logger.debug("check ddos");
-        if (!(req instanceof HttpServletRequest) || !(response instanceof HttpServletResponse)) {
-            chain.doFilter(req, response);
+        if (!(req instanceof HttpServletRequest) || !(resp instanceof HttpServletResponse)) {
+            chain.doFilter(req, resp);
             return;
         }
         HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) resp;
         if ("/jcaptcha.png".equals(request.getRequestURI())) {
-            captchaService.writeCaptchaToResponse(request, (HttpServletResponse) response);
+            captchaService.writeCaptchaToResponse(request, response);
             return;
         }
         String userCaptchaResponse = request.getParameter("captcha");
         if (userCaptchaResponse != null && captchaService.isValid(request, userCaptchaResponse)) {
             cinderellaService.whitelist(request);
-            chain.doFilter(request, response);
+            chain.doFilter(request, resp);
             return;
         }
         if (!cinderellaService.isDdos(request)) {
-            chain.doFilter(request, response);
+            chain.doFilter(request, resp);
             return;
         }
         logger.info(String.format("suspicious request %s", request.getRequestURI()));
-        request.getRequestDispatcher(ddosJsp).include(request, response);
+        response.setStatus(responseCode);
+        request.getRequestDispatcher(ddosJsp).include(request, resp);
     }
 
     @Override
@@ -92,5 +95,9 @@ public class CinderellaFilter implements Filter {
     @Autowired
     public void setCaptchaService(CaptchaService captchaService) {
         this.captchaService = captchaService;
+    }
+
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
     }
 }
