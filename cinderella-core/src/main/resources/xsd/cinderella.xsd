@@ -47,7 +47,7 @@
                 <xs:element name="session" type="cinderella:session"/>
                 <xs:element name="ip" type="cinderella:ipCondition"/>
                 <xs:element name="header" type="cinderella:requestHeaderCondition"/>
-                <xs:element name="param" type="cinderella:queryParamCondition"/>
+                <xs:element name="param" type="cinderella:paramCondition"/>
                 <xs:element name="attribute" type="cinderella:attributeCondition"/>
             </xs:choice>
         </xs:sequence>
@@ -88,7 +88,7 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="cinderella:conditionList">
-                <xs:sequence/>
+            <xs:sequence/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -113,7 +113,7 @@
         </xs:simpleContent>
     </xs:complexType>
 
-    <xs:complexType name="queryParamCondition">
+    <xs:complexType name="paramCondition">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="name" type="xs:string" use="required"/>
@@ -149,8 +149,8 @@ The {@link id} must be unique for all rules. If the id for a rule is changed, th
 
     <xs:simpleType name="identifierType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="IP"/>
             <xs:enumeration value="SESSION"/>
+            <xs:enumeration value="IP"/>
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>
