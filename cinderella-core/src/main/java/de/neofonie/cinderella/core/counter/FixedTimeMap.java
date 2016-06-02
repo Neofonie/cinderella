@@ -33,7 +33,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
-class FixedTimeMap<K, V> {
+public class FixedTimeMap<K, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(FixedTimeMap.class);
     private static final ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
@@ -62,7 +62,7 @@ class FixedTimeMap<K, V> {
         }, 5, 5, TimeUnit.MINUTES);
     }
 
-    private final static Set<WeakReference<FixedTimeMap>> allMaps = new CopyOnWriteArraySet<>();
+    private static final Set<WeakReference<FixedTimeMap>> allMaps = new CopyOnWriteArraySet<>();
     private final ConcurrentHashMap<K, Entry<V>> map = new ConcurrentHashMap<>();
 
     public FixedTimeMap() {
@@ -108,7 +108,7 @@ class FixedTimeMap<K, V> {
         return entry.getValue();
     }
 
-    static class Entry<T> {
+    public static class Entry<T> {
 
         private final T value;
         private final AtomicLong endTime;
