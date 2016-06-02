@@ -43,7 +43,7 @@ There is a full runable example under https://github.com/Neofonie/cinderella/tre
 <dependency>
   <groupId>de.neofonie.cinderella</groupId>
   <artifactId>cinderella-core</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
