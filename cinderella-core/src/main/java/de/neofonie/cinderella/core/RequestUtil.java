@@ -36,7 +36,8 @@ public final class RequestUtil {
     }
 
     public static boolean hasSession(HttpServletRequest request) {
-        return getSession(request) != null;
+        final HttpSession session = getSession(request);
+        return session != null && !session.isNew();
     }
 
     public static HttpSession getSession(HttpServletRequest request) {

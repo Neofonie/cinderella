@@ -43,9 +43,12 @@
                 <xs:element ref="cinderella:requestPath"/>
                 <xs:element name="and" type="cinderella:andCondition"/>
                 <xs:element name="or" type="cinderella:orCondition"/>
+                <xs:element name="not" type="cinderella:notCondition"/>
                 <xs:element name="session" type="cinderella:session"/>
                 <xs:element name="ip" type="cinderella:ipCondition"/>
                 <xs:element name="header" type="cinderella:requestHeaderCondition"/>
+                <xs:element name="param" type="cinderella:queryParamCondition"/>
+                <xs:element name="attribute" type="cinderella:attributeCondition"/>
             </xs:choice>
         </xs:sequence>
     </xs:complexType>
@@ -73,7 +76,19 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="cinderella:conditionList">
-            <xs:sequence/>
+                <xs:sequence/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="notCondition">
+        <xs:annotation>
+            <xs:documentation>
+                <![CDATA[matches if all condition matches. If empty, it ever matches.]]></xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="cinderella:conditionList">
+                <xs:sequence/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -91,6 +106,22 @@
     </xs:simpleType>
 
     <xs:complexType name="requestHeaderCondition">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="queryParamCondition">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="attributeCondition">
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="name" type="xs:string" use="required"/>

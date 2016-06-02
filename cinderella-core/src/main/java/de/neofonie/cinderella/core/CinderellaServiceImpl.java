@@ -60,10 +60,11 @@ public class CinderellaServiceImpl implements CinderellaService {
             }
             List<Rule> matches = cinderellaConfig.getMatches(request);
             for (Rule rule : matches) {
-                String key = rule.getIdentifierType().getIdentifier(request) + '_' + rule.getId();
+                final String identifier = rule.getIdentifierType().getIdentifier(request);
+                String key = identifier + '_' + rule.getId();
                 boolean ddos = counter.checkCount(key, rule.getRequests(), TimeUnit.MINUTES, rule.getMinutes());
                 if (ddos) {
-                    counter.blacklist(key, TimeUnit.MINUTES, cinderellaConfig.getBlacklistMinutes());
+                    blacklist(cinderellaConfig, rule, request);
                     return true;
                 }
             }
@@ -74,7 +75,12 @@ public class CinderellaServiceImpl implements CinderellaService {
         }
     }
 
-    private boolean isWhitelisted(HttpServletRequest request) {
+    protected void blacklist(CinderellaConfig cinderellaConfig, Rule rule, HttpServletRequest request) {
+        final String identifier = rule.getIdentifierType().getIdentifier(request);
+        counter.blacklist(identifier, TimeUnit.MINUTES, cinderellaConfig.getBlacklistMinutes());
+    }
+
+    protected boolean isWhitelisted(HttpServletRequest request) {
         if (IdentifierType.SESSION.accept(request)) {
             String identifier = IdentifierType.SESSION.getIdentifier(request);
             if (counter.isWhitelisted(identifier)) {
@@ -84,7 +90,7 @@ public class CinderellaServiceImpl implements CinderellaService {
         return false;
     }
 
-    private boolean isBlacklisted(HttpServletRequest request) {
+    protected boolean isBlacklisted(HttpServletRequest request) {
         for (IdentifierType identifierType : IdentifierType.values()) {
             if (identifierType.accept(request)) {
                 String key = identifierType.getIdentifier(request);

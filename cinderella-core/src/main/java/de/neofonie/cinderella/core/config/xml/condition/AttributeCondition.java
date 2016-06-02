@@ -22,53 +22,69 @@
 
 package de.neofonie.cinderella.core.config.xml.condition;
 
-import javax.validation.Valid;
+import de.neofonie.cinderella.core.config.util.PatternTypeAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import java.util.Collections;
-import java.util.List;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlValue;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.regex.Pattern;
 
-/**
- * abstract class containing a list of conditions
- */
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class ConditionList {
+public class AttributeCondition implements Condition {
 
-    @Valid
-    @XmlElements(value = {
-            @XmlElement(name = "requestPath", type = RequestPath.class),
-            @XmlElement(name = "and", type = AndCondition.class),
-            @XmlElement(name = "or", type = OrCondition.class),
-            @XmlElement(name = "not", type = NotCondition.class),
-            @XmlElement(name = "session", type = Session.class),
-            @XmlElement(name = "ip", type = IpCondition.class),
-            @XmlElement(name = "header", type = RequestHeaderCondition.class),
-            @XmlElement(name = "param", type = ParamCondition.class),
-            @XmlElement(name = "attribute", type = AttributeCondition.class)
-    })
-    private List<Condition> conditions;
+    @NotNull
+    @XmlAttribute(required = true)
+    private String name;
+    @NotNull
+    @XmlJavaTypeAdapter(PatternTypeAdapter.class)
+    @XmlValue
+    private Pattern value;
 
-    public ConditionList() {
+    public AttributeCondition() {
     }
 
-    public ConditionList(List<Condition> conditions) {
-        this.conditions = conditions;
+    public AttributeCondition(String name, Pattern value) {
+        this.name = name;
+        this.value = value;
     }
 
-    public List<Condition> getConditions() {
-        return conditions == null ? Collections.emptyList() : Collections.unmodifiableList(conditions);
+    @Override
+    public boolean matches(HttpServletRequest request) {
+        Object headers = request.getAttribute(name);
+        if (headers == null) {
+            return false;
+        }
+        if (value.matcher(value.toString()).find()) {
+            return true;
+        }
+        return false;
     }
 
-    public void setConditions(List<Condition> conditions) {
-        this.conditions = conditions;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Pattern getValue() {
+        return value;
+    }
+
+    public void setValue(Pattern value) {
+        this.value = value;
     }
 
     @Override
     public String toString() {
-        return "ConditionList{" +
-                "conditions=" + conditions +
+        return "AttributeCondition{" +
+                "name='" + name + '\'' +
+                ", value=" + value +
                 '}';
     }
 }

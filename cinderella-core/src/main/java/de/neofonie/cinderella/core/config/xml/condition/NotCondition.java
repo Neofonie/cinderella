@@ -22,55 +22,28 @@
 
 package de.neofonie.cinderella.core.config.xml.condition;
 
-import de.neofonie.cinderella.core.config.util.PatternTypeAdapter;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.regex.Pattern;
+import java.util.Collection;
 
 /**
- * matches, if the request-path is like the regex-pattern, see {@link java.util.regex.Pattern}
+ * matches if all condition matches. If empty, it ever matches.
  */
-@XmlRootElement(name = "requestPath")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class RequestPath implements Condition {
-
-    @XmlValue
-    @NotNull
-    @XmlJavaTypeAdapter(PatternTypeAdapter.class)
-    private Pattern regex;
-
-    public RequestPath() {
-    }
-
-    public RequestPath(String regex) {
-        this.regex = Pattern.compile(regex);
-    }
+public class NotCondition extends ConditionList implements Condition {
 
     @Override
     public boolean matches(HttpServletRequest request) {
-        final String requestURI = request.getRequestURI();
-        return regex.matcher(requestURI).find();
+        return allMatches(request, getConditions());
     }
 
-    public Pattern getRegex() {
-        return regex;
-    }
-
-    public void setRegex(Pattern regex) {
-        this.regex = regex;
-    }
-
-    @Override
-    public String toString() {
-        return "RequestPath{" +
-                "regex='" + regex + '\'' +
-                '}';
+    public static boolean allMatches(HttpServletRequest request, Collection<Condition> conditions) {
+        if (conditions == null) {
+            return true;
+        }
+        for (Condition condition : conditions) {
+            if (condition.matches(request)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
-

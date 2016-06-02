@@ -28,49 +28,65 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.regex.Pattern;
 
-/**
- * matches, if the request-path is like the regex-pattern, see {@link java.util.regex.Pattern}
- */
-@XmlRootElement(name = "requestPath")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RequestPath implements Condition {
+public class ParamCondition implements Condition {
 
-    @XmlValue
+    @NotNull
+    @XmlAttribute(required = true)
+    private String name;
     @NotNull
     @XmlJavaTypeAdapter(PatternTypeAdapter.class)
-    private Pattern regex;
+    @XmlValue
+    private Pattern value;
 
-    public RequestPath() {
+    public ParamCondition() {
     }
 
-    public RequestPath(String regex) {
-        this.regex = Pattern.compile(regex);
+    public ParamCondition(String name, Pattern value) {
+        this.name = name;
+        this.value = value;
     }
 
     @Override
     public boolean matches(HttpServletRequest request) {
-        final String requestURI = request.getRequestURI();
-        return regex.matcher(requestURI).find();
+        String[] headers = request.getParameterValues(name);
+        if (headers == null) {
+            return false;
+        }
+        for (String v : headers) {
+            if (value.matcher(v).find()) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public Pattern getRegex() {
-        return regex;
+    public String getName() {
+        return name;
     }
 
-    public void setRegex(Pattern regex) {
-        this.regex = regex;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Pattern getValue() {
+        return value;
+    }
+
+    public void setValue(Pattern value) {
+        this.value = value;
     }
 
     @Override
     public String toString() {
-        return "RequestPath{" +
-                "regex='" + regex + '\'' +
+        return "ParamCondition{" +
+                "name='" + name + '\'' +
+                ", value=" + value +
                 '}';
     }
 }
-

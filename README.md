@@ -52,7 +52,7 @@ There is a full runable example under https://github.com/Neofonie/cinderella/tre
 <repositories>
     <repository>
         <id>bintray</id>
-        <url>https://http://jcenter.bintray.com/</url>
+        <url>http://jcenter.bintray.com/</url>
     </repository>
 </repositories>
 ```
@@ -147,7 +147,7 @@ Now you should have added or modified following files (additional to your projec
 ## Way of working
 
 Every Request will be tracked by the servlet-filter CinderellaFilter. 
-This checked, which rules matched the current request. For every matched request, a Counter will be increased.
+This checked, which rules matched the current request. For every matched rule, a Counter will be increased.
 If a counter reached its limit within a certain time, the IP or SessionId will be blacklisted for a configurable period of time.
 
 If the IP or SessionId is blacklisted, it will redirect the request to a error-site. 
@@ -204,27 +204,170 @@ The rules config contains currently 3 parts.
 If the request doesnt contain a SessionId, these rules will be ignored.
 - requests: This amount of requests is allowed, but not more.
 - minutes: After this amount of minutes, the requests-Counter will be reseted.
-- The Rule themselve contains a list of conditions, these could be 
-  - and
-  - or
-  - ip
-  - requestPath
-  - header
-  - session available
-  - ... to be continued
+- The Rule themselve contains a list of conditions, these could be and, or, ip, requestPath, header, session available and so on. All conditions must match to apply the rule.
 
 for Details, look at [cinderella.xsd](https://raw.githubusercontent.com/Neofonie/cinderella/master/cinderella-core/src/main/resources/xsd/cinderella.xsd)
+
+#### Conditions
+
+Conditions are used in Rules and the Whitelist. There exists some predefined rules.
+
+##### ip
  
+Checks, if the request-ip is a defined IP or IP-Range.
+
+Examples:
+```XML
+<ip>127.0.0.1</ip>
+<ip>127.0.0.1-127.0.0.255</ip>
+<ip>2001:0db8:85a3:08d3:1319:8a2e:0370:7344-2001:0db8:85a3:09d3:1319:8a2e:0370:7344</ip>
+```
+The Request-IP will be extracted from:
+
+- Request-Header "X-Forwarded-For"
+- Request-Header "Proxy-Client-IP"
+- Request-Header "WL-Proxy-Client-IP"
+- Request-Header "HTTP_CLIENT_IP"
+- Request-Header "HTTP_X_FORWARDED_FOR"
+- [request.getRemoteAddr()](http://tomcat.apache.org/tomcat-7.0-doc/servletapi/javax/servlet/ServletRequest.html#getRemoteAddr())
+
+The first value in this order will be used.
+
+##### session
+
+Checks, if the request sends a valid session id. 
+
+Examples:
+```XML
+<session session="true"/>
+<session session="false"/>
+```
+
+##### requestPath
+
+checks, if the request (see [request.getRequestURI()](https://tomcat.apache.org/tomcat-7.0-doc/servletapi/javax/servlet/http/HttpServletRequest.html#getRequestURI()))
+ matches a specific [regex-pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html).
+
+The request-Uri doesnt contain protocol, host, port and querystring.
+ 
+The search is a regex - if you want a full-text search, use \Q<<TextToSearch>>\E. If you want that the request path must start with this text - use circumflex (^). For the ending use dollar ($).
+
+Examples:
+```XML
+<requestPath>oink</requestPath>
+<requestPath>^/foobar/[0-9]+/?</requestPath>
+<requestPath>^\Q/foobar\E$</requestPath>
+```
+
+##### param
+checks, if the request contains a request-param with a specific value. If more than one param with the name exists, all will be checked (for example in the querystring ?a=1&a=2&b=4).
+
+The param-name is a id, but the value is any [regex-pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html).
+
+Examples:
+```XML
+<param name="a">^[0-9]+$</param>
+<param name="a">^\Q/foobar\E$</param>
+```
+
+##### header
+checks, if the request contains a request-header with a specific value. If more than one header with the name exists, all will be checked.
+
+The param-name is a id, but the value is any [regex-pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html).
+
+Examples:
+```XML
+<header name="a">^[0-9]+$</param>
+<header name="a">^\Q/foobar\E$</param>
+```
+
+##### attribute
+
+checks, if the request contains a request-attribute with a specific value. This can only occur, if a previous filter set this attribute.
+So this is a option to implement own extentions. There Request-Attribute should be a String or implement a proper toString-Method.
+
+The attribute-name is a id, but the value is any [regex-pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html).
+
+Examples:
+```XML
+<attribute name="a">^[0-9]+$</param>
+<attribute name="a">^\Q/foobar\E$</param>
+```
+
+##### and
+
+A logical Operation - doesnt match, if any contained condition doesnt match, otherwise this condition match too. Conditions directly in a rule behaves equal to a and-list. 
+
+Examples:
+```XML
+<and>
+    <param name="a">^[0-9]+$</param>
+    <header name="a">^[0-9]+$</header>
+</and>
+```
+
+##### or
+
+A logical Operation - match, if any contained condition match, otherwise this condition dont match. This is the same behaviour in the whitelist-conditions.
+
+Examples:
+```XML
+<or>
+    <param name="a">^[0-9]+$</param>
+    <header name="a">^[0-9]+$</header>
+</or>
+```
+
+##### not
+
+A logical Operation - doesnt match, if any contained condition match, otherwise this condition matches.
+
+Examples:
+```XML
+<not>
+    <param name="a">^[0-9]+$</param>
+</not>
+```
+Not can contain multiple elements
+
+```XML
+<not>
+    <param name="a">^[0-9]+$</param>
+    <header name="a">^[0-9]+$</header>
+</not>
+```
+
+is equal to
+
+```XML
+<not>
+    <or>
+        <param name="a">^[0-9]+$</param>
+        <header name="a">^[0-9]+$</header>
+    </or>
+</not>
+```
+
 ### Whitelist
  
-Here the same conditions as for Rules can be used. 
+Here the same conditions as for Rules can be used. The difference is, that only one rule must match to identifiy the request as whitelisted one. 
 
 ## Extension
 
 For production use, the datastore should be exchanged from an in-memory model to something else - for example a (NoSQL) DB or any distributed cache. 
 To do this, you must implement an own de.neofonie.cinderella.core.counter.Counter Service and declare this as spring-bean.
 
+## Changes
+
+### 1.1.0
+
+- change config for requestHeader
+- status code 429 will be sent when blacklisted
+- fix blacklist-Bug
+- additional conditions (query, attribute, not)
+ 
 ## Todo
 
 - Implement Counter for various storage systems
 - Statistic Overview to view the most frequently requests
+- Its currently not easyliy possible to write own conditions. I'm sorry - any ideas to implement this are welcome ;-)
