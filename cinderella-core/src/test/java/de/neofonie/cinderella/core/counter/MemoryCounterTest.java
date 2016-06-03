@@ -37,16 +37,16 @@ public class MemoryCounterTest {
         final String KEY = "testDdos";
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
-        assertEquals(false, memoryCounter.checkCount(KEY, 1, TimeUnit.SECONDS, 1));
+        assertEquals(memoryCounter.incrementAndGetNormalRequestCount(KEY, TimeUnit.SECONDS, 1L), 1L);
 
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
-        assertEquals(true, memoryCounter.checkCount(KEY, 1, TimeUnit.SECONDS, 1));
+        assertEquals(memoryCounter.incrementAndGetNormalRequestCount(KEY, TimeUnit.SECONDS, 1L), 2L);
         doWait();
 
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
-        assertEquals(false, memoryCounter.checkCount(KEY, 1, TimeUnit.SECONDS, 1));
+        assertEquals(memoryCounter.incrementAndGetNormalRequestCount(KEY, TimeUnit.SECONDS, 1L), 1L);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class MemoryCounterTest {
 
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
-        memoryCounter.blacklist(KEY, TimeUnit.SECONDS, 1);
+        memoryCounter.blacklist(KEY, TimeUnit.SECONDS, 1L);
 
         assertEquals(true, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isBlacklisted("foo"));
@@ -71,7 +71,7 @@ public class MemoryCounterTest {
 
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
-        memoryCounter.whitelist(KEY, TimeUnit.SECONDS, 1);
+        memoryCounter.whitelist(KEY, TimeUnit.SECONDS, 1L);
 
         assertEquals(false, memoryCounter.isBlacklisted(KEY));
         assertEquals(true, memoryCounter.isWhitelisted(KEY));

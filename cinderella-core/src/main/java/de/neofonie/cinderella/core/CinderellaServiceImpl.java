@@ -44,29 +44,39 @@ public class CinderellaServiceImpl implements CinderellaService {
     private Counter counter;
 
     @Override
-    public boolean isDdos(HttpServletRequest request) {
+    public ActionEnum getAction(HttpServletRequest request) {
 
+        final String clientIpAddr = RequestUtil.getClientIpAddr(request);
         if (isWhitelisted(request)) {
-            return false;
-        }
-        if (isBlacklisted(request)) {
-            return true;
+            return ActionEnum.NO_DDOS;
         }
         CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
         if (cinderellaConfig == null) {
-            return false;
+            return ActionEnum.NO_DDOS;
+        }
+        final long blacklistCount = getBlacklistCount(request);
+        if (blacklistCount > 0L) {
+            final long noResponseThreshould = cinderellaConfig.getNoResponseThreshould();
+            if (noResponseThreshould > 0L && blacklistCount >= noResponseThreshould) {
+                logger.debug(String.format("%s blacklisted (%d)", clientIpAddr, blacklistCount));
+                return ActionEnum.NO_RESPONSE;
+            } else {
+                logger.debug(String.format("%s blacklisted (%d)", clientIpAddr, blacklistCount));
+                return ActionEnum.DDOS;
+            }
         }
         List<Rule> matches = cinderellaConfig.getMatches(request);
         for (Rule rule : matches) {
             final String identifier = rule.getIdentifierType().getIdentifier(request);
             String key = identifier + '_' + rule.getId();
-            boolean ddos = counter.checkCount(key, rule.getRequests(), TimeUnit.MINUTES, rule.getMinutes());
+            long count = counter.incrementAndGetNormalRequestCount(key, TimeUnit.MINUTES, rule.getMinutes());
+            boolean ddos = count >= rule.getRequests();
             if (ddos) {
                 blacklist(cinderellaConfig, rule, request);
-                return true;
+                return ActionEnum.DDOS;
             }
         }
-        return false;
+        return ActionEnum.NO_DDOS;
     }
 
     protected void blacklist(CinderellaConfig cinderellaConfig, Rule rule, HttpServletRequest request) {
@@ -84,16 +94,18 @@ public class CinderellaServiceImpl implements CinderellaService {
         return false;
     }
 
-    protected boolean isBlacklisted(HttpServletRequest request) {
+    protected long getBlacklistCount(HttpServletRequest request) {
+        long result = 0L;
         for (IdentifierType identifierType : IdentifierType.values()) {
             if (identifierType.accept(request)) {
                 String key = identifierType.getIdentifier(request);
-                if (counter.isBlacklisted(key)) {
-                    return true;
+                final long count = counter.incrementAndGetBlacklistedRequestCount(key);
+                if (count > result) {
+                    result = count;
                 }
             }
         }
-        return false;
+        return result;
     }
 
     @Override

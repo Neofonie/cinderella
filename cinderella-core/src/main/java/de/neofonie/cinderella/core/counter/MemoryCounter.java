@@ -30,25 +30,34 @@ import java.util.stream.Collectors;
 public class MemoryCounter implements Counter {
 
     private final FixedTimeMap<String, CounterData> counterMap = new FixedTimeMap<>();
-    private final FixedTimeMap<String, Long> blacklistMap = new FixedTimeMap<>();
+    private final FixedTimeMap<String, AtomicLong> blacklistMap = new FixedTimeMap<>();
     private final FixedTimeMap<String, Long> whitelistMap = new FixedTimeMap<>();
 
     @Override
-    public boolean checkCount(String key, long requests, TimeUnit timeUnit, long duration) {
-        long count = counterMap
+    public long incrementAndGetNormalRequestCount(String key, TimeUnit timeUnit, long duration) {
+        return counterMap
                 .getOrCreate(key, k -> new CounterData(), timeUnit, duration)
-                .isDdos(timeUnit, duration);
-        return count > requests;
+                .incrementAndGet(timeUnit, duration);
     }
 
     @Override
     public void blacklist(String key, TimeUnit timeUnit, long duration) {
-        blacklistMap.getOrCreate(key, s -> 1L, timeUnit, duration);
+        blacklistMap.getOrCreate(key, s -> new AtomicLong(), timeUnit, duration);
+    }
+
+    @Deprecated
+    public boolean isBlacklisted(String key) {
+        return incrementAndGetBlacklistedRequestCount(key) != 0L;
     }
 
     @Override
-    public boolean isBlacklisted(String key) {
-        return blacklistMap.get(key) != null;
+    public long incrementAndGetBlacklistedRequestCount(String key) {
+        final AtomicLong counterData = blacklistMap.get(key);
+        if (counterData == null) {
+            return 0L;
+        }
+
+        return counterData.incrementAndGet();
     }
 
     @Override
@@ -65,7 +74,7 @@ public class MemoryCounter implements Counter {
         return new Statistic(
                 getStatisticEntriesCounter(counterMap),
                 getStatisticEntries(whitelistMap),
-                getStatisticEntries(blacklistMap)
+                getStatisticEntriesAtomicLong(blacklistMap)
         );
     }
 
@@ -74,6 +83,14 @@ public class MemoryCounter implements Counter {
                 .entrySet()
                 .stream()
                 .map(e -> new StatisticEntry(e.getKey(), e.getValue().getEndTime(), null))
+                .collect(Collectors.toList());
+    }
+
+    private static List<StatisticEntry> getStatisticEntriesAtomicLong(FixedTimeMap<String, AtomicLong> map) {
+        return map
+                .entrySet()
+                .stream()
+                .map(e -> new StatisticEntry(e.getKey(), e.getValue().getEndTime(), e.getValue().getValue().get()))
                 .collect(Collectors.toList());
     }
 
@@ -94,7 +111,7 @@ public class MemoryCounter implements Counter {
             startTime = new AtomicLong(System.currentTimeMillis());
         }
 
-        private long isDdos(TimeUnit timeUnit, long duration) {
+        private long incrementAndGet(TimeUnit timeUnit, long duration) {
             long currentTimeMillis = System.currentTimeMillis();
             long duration1 = currentTimeMillis - startTime.longValue();
             if (duration1 > timeUnit.toMillis(duration)) {

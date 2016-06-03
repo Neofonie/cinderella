@@ -26,10 +26,9 @@ import java.util.concurrent.TimeUnit;
 
 public interface Counter {
 
-    /**
-     * Increment the counter and returns true, if more than x requests for this key for the given duration.
-     */
-    boolean checkCount(String key, long requests, TimeUnit timeUnit, long duration);
+    long incrementAndGetNormalRequestCount(String key, TimeUnit timeUnit, long duration);
+
+    long incrementAndGetBlacklistedRequestCount(String key);
 
     /**
      * Sets a key as whitelist for the given duration
@@ -45,9 +44,4 @@ public interface Counter {
      * Sets a key as blacklist for the given duration
      */
     void blacklist(String key, TimeUnit timeUnit, long duration);
-
-    /**
-     * returns true, if the key is blacklisted
-     */
-    boolean isBlacklisted(String key);
 }

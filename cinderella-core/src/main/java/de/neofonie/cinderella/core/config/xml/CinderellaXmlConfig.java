@@ -54,6 +54,8 @@ public class CinderellaXmlConfig implements CinderellaConfig {
     private long whitelistMinutes;
     @XmlAttribute(required = true)
     private long blacklistMinutes;
+    @XmlAttribute(required = false)
+    private Long noResponseThreshould;
 
     public List<Rule> getRules() {
         return rules;
@@ -100,6 +102,14 @@ public class CinderellaXmlConfig implements CinderellaConfig {
     @Override
     public long getWhitelistMinutes() {
         return whitelistMinutes;
+    }
+
+    @Override
+    public long getNoResponseThreshould() {
+        if (noResponseThreshould == null) {
+            return 0L;
+        }
+        return noResponseThreshould;
     }
 
     public void validate() {

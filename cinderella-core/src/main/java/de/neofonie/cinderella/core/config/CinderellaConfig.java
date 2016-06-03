@@ -34,4 +34,6 @@ public interface CinderellaConfig {
     long getBlacklistMinutes();
 
     long getWhitelistMinutes();
+
+    long getNoResponseThreshould();
 }

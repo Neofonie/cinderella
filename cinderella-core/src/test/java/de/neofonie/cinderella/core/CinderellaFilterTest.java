@@ -54,7 +54,7 @@ public class CinderellaFilterTest extends AbstractTestNGSpringContextTests {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
         FilterChain filterChain = EasyMock.createMock(FilterChain.class);
-        EasyMock.expect(cinderellaService.isDdos(mockHttpServletRequest)).andReturn(true);
+        EasyMock.expect(cinderellaService.getAction(mockHttpServletRequest)).andReturn(ActionEnum.DDOS);
         EasyMock.replay(filterChain, cinderellaService);
 
         cinderellaFilter.doFilter(mockHttpServletRequest, mockHttpServletResponse, filterChain);
@@ -68,7 +68,7 @@ public class CinderellaFilterTest extends AbstractTestNGSpringContextTests {
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
         FilterChain filterChain = EasyMock.createMock(FilterChain.class);
         filterChain.doFilter(mockHttpServletRequest, mockHttpServletResponse);
-        EasyMock.expect(cinderellaService.isDdos(mockHttpServletRequest)).andReturn(false);
+        EasyMock.expect(cinderellaService.getAction(mockHttpServletRequest)).andReturn(ActionEnum.NO_DDOS);
         EasyMock.replay(filterChain, cinderellaService);
 
         cinderellaFilter.doFilter(mockHttpServletRequest, mockHttpServletResponse, filterChain);

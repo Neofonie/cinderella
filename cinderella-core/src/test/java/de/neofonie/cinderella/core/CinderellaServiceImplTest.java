@@ -108,7 +108,7 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
 
     private int repeatUntilDdos(HttpServletRequest request) {
         int i = 1;
-        while (!ddosService.isDdos(request)) {
+        while (ddosService.getAction(request) == ActionEnum.NO_DDOS) {
             i++;
             if (i > 10000) {
                 return Integer.MAX_VALUE;
@@ -124,7 +124,7 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
     }
 
     static class TestCounter implements Counter {
-        private double count;
+        private long count;
         private long waittime;
         private long diff;
         private String whitelist;
@@ -133,7 +133,6 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
             reset(5);
         }
 
-        @Override
         public boolean checkCount(String key, long requests, TimeUnit timeUnit, long minutes) {
             count++;
             diff += waittime;
@@ -150,6 +149,22 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
         }
 
         @Override
+        public long incrementAndGetNormalRequestCount(String key, TimeUnit timeUnit, long minutes) {
+            count++;
+            diff += waittime;
+            if (diff > minutes * 60 * 1000) {
+                //idle - restart the counter
+                reset(waittime);
+            }
+            return count;
+        }
+
+        @Override
+        public long incrementAndGetBlacklistedRequestCount(String key) {
+            return 0;
+        }
+
+        @Override
         public void whitelist(String key, TimeUnit timeUnit, long duration) {
             whitelist = key;
         }
@@ -162,11 +177,6 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
         @Override
         public void blacklist(String key, TimeUnit timeUnit, long duration) {
 
-        }
-
-        @Override
-        public boolean isBlacklisted(String key) {
-            return false;
         }
 
         public void reset(long waittime) {

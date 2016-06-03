@@ -24,8 +24,8 @@
 <cinderellaXmlConfig xmlns="http://www.neofonie.de/xsd/cinderella.xsd"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:schemaLocation="http://www.neofonie.de/xsd/cinderella.xsd ../../../../cinderella-core/src/main/resources/xsd/cinderella.xsd"
-                     whitelistMinutes="3" blacklistMinutes="3">
-    <whitelist>
+                     whitelistMinutes="3" blacklistMinutes="3" noResponseThreshould="5">
+<whitelist>
         <requestPath>^/favicon.ico$</requestPath>
         <requestPath>^/whitelist$</requestPath>
     </whitelist>

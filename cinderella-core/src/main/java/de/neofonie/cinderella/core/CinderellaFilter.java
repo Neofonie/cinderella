@@ -68,13 +68,24 @@ public class CinderellaFilter implements Filter {
             chain.doFilter(request, resp);
             return;
         }
-        if (!cinderellaService.isDdos(request)) {
-            chain.doFilter(request, resp);
-            return;
+        final String clientIpAddr = RequestUtil.getClientIpAddr(request);
+        final ActionEnum actionEnum = cinderellaService.getAction(request);
+        switch (actionEnum) {
+            case NO_DDOS:
+                chain.doFilter(request, resp);
+                return;
+            case DDOS:
+                logger.info(String.format("suspicious request %s (%s)", request.getRequestURI(), clientIpAddr));
+                response.setStatus(responseCode);
+                request.getRequestDispatcher(ddosJsp).include(request, resp);
+                return;
+            case NO_RESPONSE:
+                logger.info(String.format("suspicious request %s (%s) - send no response", request.getRequestURI(), clientIpAddr));
+                response.setStatus(responseCode);
+                return;
         }
-        logger.info(String.format("suspicious request %s", request.getRequestURI()));
-        response.setStatus(responseCode);
-        request.getRequestDispatcher(ddosJsp).include(request, resp);
+        logger.error(String.format("action %s not supported", actionEnum));
+        chain.doFilter(request, resp);
     }
 
     @Override

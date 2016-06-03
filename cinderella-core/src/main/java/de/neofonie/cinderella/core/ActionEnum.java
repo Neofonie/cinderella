@@ -22,11 +22,7 @@
 
 package de.neofonie.cinderella.core;
 
-import javax.servlet.http.HttpServletRequest;
+public enum ActionEnum {
 
-public interface CinderellaService {
-
-    ActionEnum getAction(HttpServletRequest httpServletRequest);
-
-    void whitelist(HttpServletRequest request);
+    NO_DDOS, DDOS, NO_RESPONSE;
 }
