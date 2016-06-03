@@ -40,6 +40,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -50,22 +52,39 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
     private static final Logger logger = LoggerFactory.getLogger(CinderellaXmlConfigLoaderFactory.class);
     private Validator validator;
     private Resource xmlConfigPath;
+    private Resource xmlConfigPath2;
 
     public CinderellaXmlConfigLoader createInstance() {
+        final List<CinderellaXmlConfigLoader> cinderellaXmlConfigLoaders = new ArrayList<>();
+        if (xmlConfigPath != null) {
+            cinderellaXmlConfigLoaders.add(createInstance(xmlConfigPath));
+        }
+        if (xmlConfigPath2 != null) {
+            cinderellaXmlConfigLoaders.add(createInstance(xmlConfigPath2));
+        }
+        if (cinderellaXmlConfigLoaders.isEmpty()) {
+            throw new IllegalArgumentException("No Resource defined");
+        }
+        return new CinderellaXmlConfigLoaderList(cinderellaXmlConfigLoaders);
+    }
+
+    private CinderellaXmlConfigLoader createInstance(Resource resource) {
 
         CinderellaXmlConfig cinderellaConfig = null;
         try {
-            cinderellaConfig = load(xmlConfigPath.getInputStream());
+            cinderellaConfig = load(resource.getInputStream(), resource.toString());
+        } catch (FileNotFoundException e) {
+            logger.info(e.getMessage());
         } catch (IOException e) {
             logger.error("", e);
         }
 
         try {
-            File file = xmlConfigPath.getFile();
+            File file = resource.getFile();
 
             return new ReloadableCinderellaXmlConfigLoader(file, cinderellaConfig, this);
         } catch (IOException e) {
-            //Ignore - occurs if xmlConfigPath is not a file (for example a file in a jar)
+            //Ignore - occurs if resource is not a file (for example a file in a jar)
             return new StaticCinderellaXmlConfigLoader(cinderellaConfig);
         }
     }
@@ -85,6 +104,25 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
         return false;
     }
 
+    private static class CinderellaXmlConfigLoaderList implements CinderellaXmlConfigLoader {
+        private final List<CinderellaXmlConfigLoader> cinderellaXmlConfigLoaders;
+
+        private CinderellaXmlConfigLoaderList(List<CinderellaXmlConfigLoader> cinderellaXmlConfigLoaders) {
+            this.cinderellaXmlConfigLoaders = cinderellaXmlConfigLoaders;
+        }
+
+        @Override
+        public CinderellaConfig getCinderellaConfig() {
+            for (CinderellaXmlConfigLoader cinderellaXmlConfigLoader : cinderellaXmlConfigLoaders) {
+                final CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+                if (cinderellaConfig != null) {
+                    return cinderellaConfig;
+                }
+            }
+            return null;
+        }
+    }
+
     private static class StaticCinderellaXmlConfigLoader implements CinderellaXmlConfigLoader {
         private final CinderellaConfig cinderellaConfig;
 
@@ -93,7 +131,7 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
         }
 
         @Override
-        public CinderellaConfig getCinderellaConfig() throws IOException {
+        public CinderellaConfig getCinderellaConfig() {
             return cinderellaConfig;
         }
     }
@@ -111,6 +149,7 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
         }
 
         private void createWatcher(File file) {
+            logger.info(String.format("Init FileWatcher for %s", file.getAbsolutePath()));
             FileWatcher.createWatcher(file.getParentFile(), new Function<File, Void>() {
                 @Override
                 public Void apply(File changedFile) {
@@ -129,7 +168,7 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
         }
 
         @Override
-        public CinderellaConfig getCinderellaConfig() throws IOException {
+        public CinderellaConfig getCinderellaConfig() {
             return cinderellaConfig.get();
         }
     }
@@ -138,9 +177,9 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
         try {
             InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
             try {
-                return load(inputStream);
+                return load(inputStream, file.getAbsolutePath());
             } finally {
-                if (inputStream != null) try {
+                try {
                     inputStream.close();
                 } catch (IOException e) {
 
@@ -152,7 +191,7 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
         }
     }
 
-    private CinderellaXmlConfig load(InputStream inputStream) {
+    private CinderellaXmlConfig load(InputStream inputStream, String path) {
         try {
             logger.debug("load");
             JAXBContext jc = JAXBContext.newInstance(CinderellaXmlConfig.CLASSES);
@@ -182,10 +221,10 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
                     .stream()
                     .map(s -> s.toString())
                     .collect(Collectors.joining("\n"));
-            logger.error(String.format("Error loading %s:%s", xmlConfigPath, message));
+            logger.error(String.format("Error loading %s:%s", path, message));
             return null;
         } catch (SAXException | JAXBException | IllegalArgumentException e) {
-            logger.error(String.format("Error loading %s", xmlConfigPath), e);
+            logger.error(String.format("Error loading %s", path), e);
             return null;
         }
     }
@@ -193,6 +232,10 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
     @Required
     public void setXmlConfigPath(Resource xmlConfigPath) {
         this.xmlConfigPath = xmlConfigPath;
+    }
+
+    public void setXmlConfigPath2(Resource xmlConfigPath2) {
+        this.xmlConfigPath2 = xmlConfigPath2;
     }
 
     @Autowired

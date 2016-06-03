@@ -22,9 +22,33 @@
 
 package de.neofonie.cinderella.core.config.loader;
 
-import de.neofonie.cinderella.core.config.CinderellaConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public interface CinderellaXmlConfigLoader {
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
-    CinderellaConfig getCinderellaConfig();
+import static org.testng.Assert.assertTrue;
+
+public class TestUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestUtils.class);
+
+    public static File createTempDirectory(String name) throws IOException {
+        final File file = Files.createTempDirectory(name).toFile();
+        logger.info(String.format("Create temp dir %s", file.getAbsolutePath()));
+        file.deleteOnExit();
+        return file;
+    }
+
+    public static void delete(File file) throws IOException {
+        logger.info(String.format("Delete %s", file.getAbsolutePath()));
+        assertTrue(file.delete());
+    }
+
+    public static void mkdir(File file) throws IOException {
+        logger.info(String.format("Create dir %s", file.getAbsolutePath()));
+        assertTrue(file.mkdir());
+    }
 }

@@ -32,7 +32,8 @@
           p:ddosJsp="/WEB-INF/jsp/cinderella.jsp"/>
     <bean id="cinderellaXmlConfigLoader"
           class="de.neofonie.cinderella.core.config.loader.CinderellaXmlConfigLoaderFactory"
-          p:xmlConfigPath="classpath:cinderellaConfig.xml"/>
+          p:xmlConfigPath="file:/etc/opt/cinderella/cinderellaConfig.xml"
+          p:xmlConfigPath2="classpath:cinderellaConfig.xml"/>
     <bean id="cinderellaMemoryCounter" class="de.neofonie.cinderella.core.counter.MemoryCounter"/>
 
 </beans>

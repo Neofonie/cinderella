@@ -20,12 +20,13 @@
  *
  */
 
-package de.neofonie.cinderella.core.config.xml;
+package de.neofonie.cinderella.core.config.loader;
 
 import de.neofonie.cinderella.core.config.CinderellaConfig;
-import de.neofonie.cinderella.core.config.loader.CinderellaXmlConfigLoader;
-import de.neofonie.cinderella.core.config.loader.CinderellaXmlConfigLoaderFactory;
+import de.neofonie.cinderella.core.config.xml.CinderellaXmlConfig;
+import de.neofonie.cinderella.core.config.xml.Rule;
 import de.neofonie.cinderella.core.config.xml.condition.RequestPath;
+import org.easymock.EasyMock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -48,15 +49,56 @@ import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.*;
 
-public class CinderellaXmlConfigLoaderImplTest {
+public class CinderellaXmlConfigLoaderFactoryTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(CinderellaXmlConfigLoaderImplTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(CinderellaXmlConfigLoaderFactoryTest.class);
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testNothingSet() throws Exception {
+        CinderellaXmlConfigLoaderFactory cinderellaXmlConfigLoaderFactory = new CinderellaXmlConfigLoaderFactory();
+
+        final CinderellaXmlConfigLoader cinderellaXmlConfigLoader = cinderellaXmlConfigLoaderFactory.getObject();
+        assertNotNull(cinderellaXmlConfigLoader);
+        assertNull(cinderellaXmlConfigLoader.getCinderellaConfig());
+    }
+
+    @Test
+    public void testInputStreamFails() throws Exception {
+        CinderellaXmlConfigLoaderFactory cinderellaXmlConfigLoaderFactory = new CinderellaXmlConfigLoaderFactory();
+
+        Resource xmlConfigPath = EasyMock.createMock(Resource.class);
+        cinderellaXmlConfigLoaderFactory.setXmlConfigPath(xmlConfigPath);
+        EasyMock.expect(xmlConfigPath.getInputStream()).andThrow(new IOException());
+        EasyMock.expect(xmlConfigPath.getFile()).andThrow(new IOException());
+
+        EasyMock.replay(xmlConfigPath);
+        final CinderellaXmlConfigLoader cinderellaXmlConfigLoader = cinderellaXmlConfigLoaderFactory.getObject();
+        assertNotNull(cinderellaXmlConfigLoader);
+        assertNull(cinderellaXmlConfigLoader.getCinderellaConfig());
+        EasyMock.verify(xmlConfigPath);
+    }
+
+    @Test
+    public void testResourceThrowsIOException() throws Exception {
+        CinderellaXmlConfigLoaderFactory cinderellaXmlConfigLoaderFactory = new CinderellaXmlConfigLoaderFactory();
+
+        Resource xmlConfigPath = EasyMock.createMock(Resource.class);
+        cinderellaXmlConfigLoaderFactory.setXmlConfigPath(xmlConfigPath);
+        EasyMock.expect(xmlConfigPath.getInputStream()).andThrow(new IOException());
+        EasyMock.expect(xmlConfigPath.getFile()).andThrow(new IOException());
+
+        EasyMock.replay(xmlConfigPath);
+        final CinderellaXmlConfigLoader cinderellaXmlConfigLoader = cinderellaXmlConfigLoaderFactory.getObject();
+        assertNotNull(cinderellaXmlConfigLoader);
+        assertNull(cinderellaXmlConfigLoader.getCinderellaConfig());
+        EasyMock.verify(xmlConfigPath);
+    }
 
     @Test
     public void testLoad() throws Exception {
         InputStream testXml = CinderellaXmlConfig.class.getClassLoader().getResourceAsStream("test.xml");
         assertNotNull(testXml);
-        CinderellaXmlConfigLoader cinderellaXmlConfigLoader = createCinderellaXmlConfigLoader(new InputStreamResource(testXml));
+        CinderellaXmlConfigLoader cinderellaXmlConfigLoader = createCinderellaXmlConfigLoader(new InputStreamResource(testXml), null);
         CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
         assertNotNull(cinderellaConfig);
         assertEquals(cinderellaConfig.getBlacklistMinutes(), 60);
@@ -66,7 +108,7 @@ public class CinderellaXmlConfigLoaderImplTest {
     public void testLoadInvalid() throws Exception {
         InputStream testXml = CinderellaXmlConfig.class.getClassLoader().getResourceAsStream("testInvalid.xml");
         assertNotNull(testXml);
-        CinderellaXmlConfigLoader cinderellaXmlConfigLoader = createCinderellaXmlConfigLoader(new InputStreamResource(testXml));
+        CinderellaXmlConfigLoader cinderellaXmlConfigLoader = createCinderellaXmlConfigLoader(new InputStreamResource(testXml), null);
         CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
         assertNull(cinderellaConfig);
     }
@@ -91,7 +133,7 @@ public class CinderellaXmlConfigLoaderImplTest {
         File file = createTempFile();
 
         copyFile(file, "test.xml");
-        CinderellaXmlConfigLoader cinderellaXmlConfigLoader = createCinderellaXmlConfigLoader(new FileSystemResource(file));
+        CinderellaXmlConfigLoader cinderellaXmlConfigLoader = createCinderellaXmlConfigLoader(new FileSystemResource(file), null);
 
         //Test first load
         CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
@@ -107,13 +149,38 @@ public class CinderellaXmlConfigLoaderImplTest {
         assertEquals(cinderellaConfig.getBlacklistMinutes(), 30);
     }
 
+    @Test
+    public void testCreateFileLater() throws Exception {
+        File tempDirectory = createTempDir();
+        TestUtils.delete(tempDirectory);
+        File file = new File(tempDirectory, "temp.xml");
+
+        CinderellaXmlConfigLoader cinderellaXmlConfigLoader = createCinderellaXmlConfigLoader(new FileSystemResource(file), null);
+
+        //Test first load
+        CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+        assertNull(cinderellaConfig);
+
+        TimeUnit.SECONDS.sleep(10);
+        assertTrue(tempDirectory.mkdir());
+        copyFile(file, "test.xml");
+
+        TimeUnit.SECONDS.sleep(15);
+        cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+        assertNotNull(cinderellaConfig);
+    }
+
     private File createTempFile() throws IOException {
-        File tempDirectory = Files.createTempDirectory("CinderellaXmlConfigLoaderImplReloadableTest").toFile();
+        File tempDirectory = createTempDir();
         tempDirectory.deleteOnExit();
 
         File file = new File(tempDirectory, "temp.xml");
         file.deleteOnExit();
         return file;
+    }
+
+    private File createTempDir() throws IOException {
+        return TestUtils.createTempDirectory("CinderellaXmlConfigLoaderImplReloadableTest");
     }
 
     private void copyFile(File file, String name) throws IOException {
@@ -122,7 +189,7 @@ public class CinderellaXmlConfigLoaderImplTest {
         logger.info("Copy " + name + " to " + file.getAbsolutePath());
     }
 
-    private CinderellaXmlConfigLoader createCinderellaXmlConfigLoader(Resource resource) {
+    private CinderellaXmlConfigLoader createCinderellaXmlConfigLoader(Resource resource, Resource resource2) {
         CinderellaXmlConfigLoaderFactory cinderellaXmlConfigLoader = new CinderellaXmlConfigLoaderFactory();
         cinderellaXmlConfigLoader.setXmlConfigPath(resource);
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();

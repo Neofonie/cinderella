@@ -29,7 +29,6 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -86,11 +85,11 @@ public class FileWatcherTest {
     @Test
     public void testCreateDirLater() throws Exception {
         File tempDirectory = createTempDir();
-        tempDirectory.delete();
+        TestUtils.delete(tempDirectory);
         LinkedBlockingQueue<File> files = createWatcher(tempDirectory);
 
         TimeUnit.SECONDS.sleep(2);
-        tempDirectory.mkdir();
+        TestUtils.mkdir(tempDirectory);
         File tempFile = new File(tempDirectory, "tempFile.xml");
         assertTrue(files.isEmpty());
 
@@ -105,10 +104,10 @@ public class FileWatcherTest {
         LinkedBlockingQueue<File> files = createWatcher(tempDirectory);
 
         TimeUnit.SECONDS.sleep(2);
-        tempDirectory.delete();
+        TestUtils.delete(tempDirectory);
 
         TimeUnit.SECONDS.sleep(2);
-        tempDirectory.mkdir();
+        TestUtils.mkdir(tempDirectory);
 
         File tempFile = new File(tempDirectory, "tempFile.xml");
         FileCopyUtils.copy("Fooo".getBytes(), tempFile);
@@ -157,9 +156,6 @@ public class FileWatcherTest {
     }
 
     private File createTempDir() throws IOException {
-        final File file = Files.createTempDirectory("FileWatcherTest").toFile();
-        logger.info(String.format("Create temp dir %s", file.getAbsolutePath()));
-        file.deleteOnExit();
-        return file;
+        return TestUtils.createTempDirectory("FileWatcherTest");
     }
 }

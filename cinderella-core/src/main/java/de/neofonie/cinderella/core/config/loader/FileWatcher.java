@@ -66,7 +66,7 @@ public class FileWatcher {
             }
 
         } finally {
-            logger.error("Watcher-Thread shutdown");
+            logger.error(String.format("Watcher-Thread for %s shutdown", directory.getAbsolutePath()));
         }
     }
 
@@ -134,7 +134,7 @@ public class FileWatcher {
             }
 
         } finally {
-            logger.error(String.format("Watcher-Thread %s shutdown", directory.getAbsolutePath()));
+            logger.warn(String.format("Watcher %s shutdown", directory.getAbsolutePath()));
         }
     }
 

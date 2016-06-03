@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -47,32 +46,27 @@ public class CinderellaServiceImpl implements CinderellaService {
     @Override
     public boolean isDdos(HttpServletRequest request) {
 
-        try {
-            if (isWhitelisted(request)) {
-                return false;
-            }
-            if (isBlacklisted(request)) {
-                return true;
-            }
-            CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
-            if (cinderellaConfig == null) {
-                return false;
-            }
-            List<Rule> matches = cinderellaConfig.getMatches(request);
-            for (Rule rule : matches) {
-                final String identifier = rule.getIdentifierType().getIdentifier(request);
-                String key = identifier + '_' + rule.getId();
-                boolean ddos = counter.checkCount(key, rule.getRequests(), TimeUnit.MINUTES, rule.getMinutes());
-                if (ddos) {
-                    blacklist(cinderellaConfig, rule, request);
-                    return true;
-                }
-            }
-            return false;
-        } catch (IOException e) {
-            logger.error("", e);
+        if (isWhitelisted(request)) {
             return false;
         }
+        if (isBlacklisted(request)) {
+            return true;
+        }
+        CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+        if (cinderellaConfig == null) {
+            return false;
+        }
+        List<Rule> matches = cinderellaConfig.getMatches(request);
+        for (Rule rule : matches) {
+            final String identifier = rule.getIdentifierType().getIdentifier(request);
+            String key = identifier + '_' + rule.getId();
+            boolean ddos = counter.checkCount(key, rule.getRequests(), TimeUnit.MINUTES, rule.getMinutes());
+            if (ddos) {
+                blacklist(cinderellaConfig, rule, request);
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void blacklist(CinderellaConfig cinderellaConfig, Rule rule, HttpServletRequest request) {
@@ -110,14 +104,10 @@ public class CinderellaServiceImpl implements CinderellaService {
         }
         String identifier = IdentifierType.SESSION.getIdentifier(request);
 
-        try {
-            CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
-            if (cinderellaConfig == null) {
-                return;
-            }
-            counter.whitelist(identifier, TimeUnit.MINUTES, cinderellaConfig.getWhitelistMinutes());
-        } catch (IOException e) {
-            logger.error("", e);
+        CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+        if (cinderellaConfig == null) {
+            return;
         }
+        counter.whitelist(identifier, TimeUnit.MINUTES, cinderellaConfig.getWhitelistMinutes());
     }
 }
