@@ -27,8 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -39,15 +43,11 @@ public class FileWatcher {
 
     public static void createWatcher(File directory, Function<File, Void> function) {
 
-        if (!directory.isDirectory()) {
-            throw new IllegalArgumentException("Path: " + directory.getAbsolutePath() + " is not a folder");
-        }
-
         Runnable runnable = new Runnable() {
 
             @Override
             public void run() {
-                watchDirectoryPath(directory, function);
+                watchRun(directory, function);
             }
         };
 
@@ -55,52 +55,86 @@ public class FileWatcher {
 
     }
 
-    public static void watchDirectoryPath(File directory, Function<File, Void> function) {
-        // Sanity check - Check if path is a folder
-        if (!directory.isDirectory()) {
-            throw new IllegalArgumentException("Path: " + directory.getAbsolutePath() + " is not a folder");
+    private static void watchRun(File directory, Function<File, Void> function) {
+        try {
+            while (true) {
+
+                // Sanity check - Check if path is a folder
+                waitTillPathExists(directory);
+
+                watchDirectoryPath(directory, function);
+            }
+
+        } finally {
+            logger.error("Watcher-Thread shutdown");
+        }
+    }
+
+    private static void waitTillPathExists(File directory) {
+        if (!directory.exists() || !directory.isDirectory()) {
+            logger.info(String.format("Path: %s is not a folder or dosnt exists", directory.getAbsolutePath()));
+            while (!directory.exists() || !directory.isDirectory()) {
+                try {
+                    TimeUnit.SECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    logger.warn("", e);
+                }
+            }
+        }
+    }
+
+    private static void watchDirectoryPath(File directory, Function<File, Void> function) {
+        if (!directory.exists() || !directory.isDirectory()) {
+            logger.warn(String.format("Path: %s is not a folder or dosnt exists", directory.getAbsolutePath()));
+            return;
         }
 
-        logger.info("Watching path: " + directory.getAbsolutePath());
+        try {
+            logger.info("Watching path: " + directory.getAbsolutePath());
 
-        // We obtain the file system of the Path
-        Path path = directory.toPath();
-        FileSystem fs = path.getFileSystem();
+            // We obtain the file system of the Path
+            Path path = directory.toPath();
 
-        // We create the new WatchService using the new try() block
-        try (WatchService service = fs.newWatchService()) {
+            // We create the new WatchService using the new try() block
+            try (WatchService service = path.getFileSystem().newWatchService()) {
 
-            // We register the path to the service
-            // We watch for creation events
-            path.register(service, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+                // We register the path to the service
+                // We watch for creation events
+                path.register(service, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
-            // Start the infinite polling loop
-            while (true) {
-                WatchKey key = service.take();
+                //apply function for created files before watcher starts
+                for (File file : directory.listFiles()) {
+                    logger.debug(String.format("Existing file %s", file.getAbsolutePath()));
+                    function.apply(file);
+                }
+                // Start the infinite polling loop
+                while (true) {
+                    WatchKey key = service.take();
 
-                // Dequeueing events
-                for (WatchEvent<?> watchEvent : key.pollEvents()) {
+                    // Dequeueing events
+                    for (WatchEvent<?> watchEvent : key.pollEvents()) {
+                        // Get the type of the event
+                        Kind<?> kind = watchEvent.kind();
+                        if (!OVERFLOW.equals(kind)) {
+                            // A new Path was created
+                            Path newPath = ((WatchEvent<Path>) watchEvent).context();
+                            logger.info("changed " + newPath + " " + kind);
+                            function.apply(path.resolve(newPath).toFile());
+                        }
+                    }
 
-                    // Get the type of the event
-                    Kind<?> kind = watchEvent.kind();
-                    if (!OVERFLOW.equals(kind)) {
-                        // A new Path was created
-                        Path newPath = ((WatchEvent<Path>) watchEvent).context();
-                        logger.info("changed " + newPath + " " + kind);
-                        function.apply(path.resolve(newPath).toFile());
+                    if (!key.reset()) {
+                        logger.error(String.format("Watching for %s is no longer possible", directory.getAbsolutePath()));
+                        break; //loop
                     }
                 }
 
-                if (!key.reset()) {
-                    logger.error(String.format("Watching for %s is no longer possible", directory.getAbsolutePath()));
-                    break; //loop
-                }
+            } catch (IOException | InterruptedException ioe) {
+                logger.warn("", ioe);
             }
 
-        } catch (IOException | InterruptedException ioe) {
-            logger.error("", ioe);
         } finally {
-            logger.error("Watcher-Thread shutdown");
+            logger.error(String.format("Watcher-Thread %s shutdown", directory.getAbsolutePath()));
         }
     }
 
