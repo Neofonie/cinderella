@@ -174,18 +174,12 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
     }
 
     private CinderellaXmlConfig load(File file) {
-        try {
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-            try {
-                return load(inputStream, file.getAbsolutePath());
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-
-                }
-            }
+        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+            return load(inputStream, file.getAbsolutePath());
         } catch (FileNotFoundException e) {
+            logger.error("", e);
+            return null;
+        } catch (IOException e) {
             logger.error("", e);
             return null;
         }
@@ -204,9 +198,12 @@ public class CinderellaXmlConfigLoaderFactory implements FactoryBean<CinderellaX
             });
 
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            InputStream schemaInputStream = CinderellaXmlConfigLoaderFactory.class.getClassLoader().getResourceAsStream("xsd/cinderella.xsd");
-            Schema schema = schemaFactory.newSchema(new StreamSource(schemaInputStream));
-            unmarshaller.setSchema(schema);
+            try (InputStream schemaInputStream = CinderellaXmlConfigLoaderFactory.class.getClassLoader().getResourceAsStream("xsd/cinderella.xsd")) {
+                Schema schema = schemaFactory.newSchema(new StreamSource(schemaInputStream));
+                unmarshaller.setSchema(schema);
+            } catch (IOException e) {
+                logger.warn("", e);
+            }
 
             CinderellaXmlConfig ddosXmlConfig = (CinderellaXmlConfig) unmarshaller.unmarshal(inputStream);
             ddosXmlConfig.validate();

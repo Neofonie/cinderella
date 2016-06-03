@@ -32,10 +32,7 @@ public class NotCondition extends ConditionList implements Condition {
 
     @Override
     public boolean matches(HttpServletRequest request) {
-        return allMatches(request, getConditions());
-    }
-
-    public static boolean allMatches(HttpServletRequest request, Collection<Condition> conditions) {
+        Collection<Condition> conditions = getConditions();
         if (conditions == null) {
             return true;
         }

@@ -37,9 +37,12 @@ import java.util.function.Function;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
-public class FileWatcher {
+public final class FileWatcher {
 
     private static final Logger logger = LoggerFactory.getLogger(FileWatcher.class);
+
+    private FileWatcher() {
+    }
 
     public static void createWatcher(File directory, Function<File, Void> function) {
 
@@ -145,7 +148,7 @@ public class FileWatcher {
         thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                logger.error(String.format("ReloadableCinderellaXmlConfigLoader fails, config-changes will no longer be loaded", e));
+                logger.error("ReloadableCinderellaXmlConfigLoader fails, config-changes will no longer be loaded", e);
             }
         });
         return thread;

@@ -24,5 +24,5 @@ package de.neofonie.cinderella.core;
 
 public enum ActionEnum {
 
-    NO_DDOS, DDOS, NO_RESPONSE;
+    NO_DDOS, DDOS, NO_RESPONSE
 }

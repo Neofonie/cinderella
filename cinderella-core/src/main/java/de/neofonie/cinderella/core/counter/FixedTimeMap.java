@@ -46,7 +46,7 @@ public class FixedTimeMap<K, V> {
             thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
-                    logger.error(String.format("Clean-Up Job in MemoryCounter fails, can result in OutOfMemory", e));
+                    logger.error("Clean-Up Job in MemoryCounter fails, can result in OutOfMemory", e);
                 }
             });
             return thread;
@@ -72,7 +72,9 @@ public class FixedTimeMap<K, V> {
     private static void cleanUp() {
         for (WeakReference<FixedTimeMap> fixedTimeMapWeakReference : allMaps) {
             FixedTimeMap fixedTimeMap = fixedTimeMapWeakReference.get();
-            if (fixedTimeMap != null) fixedTimeMap.cleanUpMap();
+            if (fixedTimeMap != null) {
+                fixedTimeMap.cleanUpMap();
+            }
         }
     }
 
@@ -116,7 +118,7 @@ public class FixedTimeMap<K, V> {
         private Entry(T value, TimeUnit timeUnit, long duration) {
             this.value = value;
             long l = System.currentTimeMillis() + timeUnit.toMillis(duration);
-            this.endTime = new AtomicLong(l);
+            endTime = new AtomicLong(l);
         }
 
         private boolean isRemove() {
