@@ -371,13 +371,50 @@ is equal to
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cinderellaXmlConfig xmlns="http://www.neofonie.de/xsd/cinderella.xsd"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                     xsi:schemaLocation="http://www.neofonie.de/xsd/cinderella.xsd https://raw.githubusercontent.com/Neofonie/cinderella/master/cinderella-core/src/main/resources/xsd/cinderella.xsd"
-                     whitelistMinutes="3" blacklistMinutes="3" noResponseThreshould="10">
+                     xsi:schemaLocation="http://www.neofonie.de/xsd/cinderella.xsd ../../../../cinderella-core/src/main/resources/xsd/cinderella.xsd"
+                     whitelistMinutes="30" blacklistMinutes="30" noResponseThreshould="10">
     <whitelist>
-        Whitelist section... 
+        <requestPath>^/favicon.ico$</requestPath>
+        <requestPath>^/whitelist$</requestPath>
+        <!-- see https://support.google.com/webmasters/answer/80553?hl=de -->
+        <and>
+            <userAgent>Googlebot</userAgent>
+            <or>
+                <hostName>googlebot.com$</hostName>
+                <hostName>google.com$</hostName>
+            </or>
+        </and>
+
+        <!-- see http://www.spanishseo.org/how-to-identify-user-agents-and-ip-addresses-for-bot-blocking -->
+        <!--Yahoo crawlers will end with crawl.yahoo.net like in llf520064.crawl.yahoo.net.-->
+        <and>
+            <userAgent>\QYahoo! Slurp\E</userAgent>
+            <hostName>crawl.yahoo.net$</hostName>
+        </and>
+
+        <!-- https://www.bing.com/webmaster/help/verifying-that-bingbot-is-bingbot-3905dc26 -->
+        <and>
+            <userAgent>bingbot</userAgent>
+            <hostName>search.msn.com$</hostName>
+        </and>
+
     </whitelist>
     <rules>
-        Rules ...
+        <rule id="ip" identifierType="IP" requests="30" minutes="30">
+            <session session="false"/>
+        </rule>
+        <rule id="session" identifierType="SESSION" requests="120" minutes="30">
+            <session session="true"/>
+        </rule>
+
+        <!-- Blacklist user which claims to be a whitelisted search spider -->
+        <rule id="noCrawler" identifierType="IP" requests="3" minutes="30">
+            <or>
+                <userAgent>Googlebot</userAgent>
+                <userAgent>\QYahoo! Slurp\E</userAgent>
+                <userAgent>bingbot</userAgent>
+            </or>
+        </rule>
     </rules>
 </cinderellaXmlConfig>
 ```
