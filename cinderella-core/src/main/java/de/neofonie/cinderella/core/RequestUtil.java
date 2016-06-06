@@ -56,7 +56,7 @@ public final class RequestUtil {
                     .maximumSize(1000)
                     .expireAfterWrite(30, TimeUnit.MINUTES)
                     .build(HOSTNAME_CACHE_LOADER);
-    public static final String UNKNOWN_HOST = "";
+    private static final String UNKNOWN_HOST = "";
 
     private RequestUtil() {
     }

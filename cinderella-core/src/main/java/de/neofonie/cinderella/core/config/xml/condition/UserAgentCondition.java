@@ -44,7 +44,7 @@ public class UserAgentCondition implements Condition {
     public UserAgentCondition() {
     }
 
-    public UserAgentCondition(String name, Pattern value) {
+    public UserAgentCondition(Pattern value) {
         this.value = value;
     }
 

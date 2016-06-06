@@ -58,10 +58,7 @@ public class AttributeCondition implements Condition {
         if (headers == null) {
             return false;
         }
-        if (value.matcher(value.toString()).find()) {
-            return true;
-        }
-        return false;
+        return value.matcher(headers.toString()).find();
     }
 
     public String getName() {

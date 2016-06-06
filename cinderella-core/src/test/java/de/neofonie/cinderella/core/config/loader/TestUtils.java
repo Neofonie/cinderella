@@ -31,9 +31,12 @@ import java.nio.file.Files;
 
 import static org.testng.Assert.assertTrue;
 
-public class TestUtils {
+public final class TestUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(TestUtils.class);
+
+    private TestUtils() {
+    }
 
     public static File createTempDirectory(String name) throws IOException {
         final File file = Files.createTempDirectory(name).toFile();
@@ -42,12 +45,12 @@ public class TestUtils {
         return file;
     }
 
-    public static void delete(File file) throws IOException {
+    public static void delete(File file) {
         logger.info(String.format("Delete %s", file.getAbsolutePath()));
         assertTrue(file.delete());
     }
 
-    public static void mkdir(File file) throws IOException {
+    public static void mkdir(File file) {
         logger.info(String.format("Create dir %s", file.getAbsolutePath()));
         assertTrue(file.mkdir());
     }

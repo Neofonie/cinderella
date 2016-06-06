@@ -133,21 +133,6 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
             reset(5);
         }
 
-        public boolean checkCount(String key, long requests, TimeUnit timeUnit, long minutes) {
-            count++;
-            diff += waittime;
-            if (diff > minutes * 60 * 1000) {
-                //idle - restart the counter
-                reset(waittime);
-                return false;
-            }
-            if (count >= requests) {
-                //ddos
-                return true;
-            }
-            return false;
-        }
-
         @Override
         public long incrementAndGetNormalRequestCount(String key, TimeUnit timeUnit, long minutes) {
             count++;
