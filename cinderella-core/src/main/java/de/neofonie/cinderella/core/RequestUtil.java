@@ -22,10 +22,39 @@
 
 package de.neofonie.cinderella.core;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public final class RequestUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+    private final static CacheLoader<String, String> HOSTNAME_CACHE_LOADER =
+            new CacheLoader<String, String>() {
+                public String load(String clientIpAddr) {
+                    final String hostNameHelper = getHostNameHelper(clientIpAddr);
+                    if (hostNameHelper == null) {
+                        return UNKNOWN_HOST;
+                    }
+                    return hostNameHelper;
+                }
+            };
+    private final static LoadingCache<String, String> HOSTNAME_CACHE =
+            CacheBuilder
+                    .newBuilder()
+                    .maximumSize(1000)
+                    .expireAfterWrite(30, TimeUnit.MINUTES)
+                    .build(HOSTNAME_CACHE_LOADER);
+    public static final String UNKNOWN_HOST = "";
 
     private RequestUtil() {
     }
@@ -66,5 +95,49 @@ public final class RequestUtil {
             return ip;
         }
         return request.getRemoteAddr();
+    }
+
+    public static String getHostName(HttpServletRequest request) {
+        final String clientIpAddr = getClientIpAddr(request);
+        if (clientIpAddr == null) {
+            return null;
+        }
+        try {
+            final String host = HOSTNAME_CACHE.get(clientIpAddr);
+            if (UNKNOWN_HOST.equals(host)) {
+                return null;
+            }
+            return host;
+        } catch (ExecutionException e) {
+            logger.error("", e);
+            return null;
+        }
+    }
+
+    static String getHostNameHelper(final String clientIpAddr) {
+
+        if (clientIpAddr == null) {
+            return null;
+        }
+
+        try {
+            final long start = System.nanoTime();
+            InetAddress ia = InetAddress.getByName(clientIpAddr);
+            final String canonicalHostName = ia.getCanonicalHostName();
+            if (canonicalHostName == null) {
+                logger.info(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
+                return null;
+            }
+            final String hostAddress = InetAddress.getByName(canonicalHostName).getHostAddress();
+            if (clientIpAddr.equals(hostAddress)) {
+                logger.info(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
+                return canonicalHostName;
+            }
+            logger.info(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
+            return null;
+        } catch (UnknownHostException e) {
+            logger.info(e.getMessage());
+            return null;
+        }
     }
 }
