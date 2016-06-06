@@ -24,17 +24,17 @@ Table of Contents
       * [Whitelist](#whitelist)
       * [Conditions](#conditions)
         * [ip](#ip)
-        * [hostName](#hostName)
+        * [hostName](#hostname)
         * [session](#session)
         * [requestPath](#requestPath)
         * [param](#param)
         * [header](#header)
-        * [userAgent](#userAgent)
+        * [userAgent](#useragent)
         * [attribute](#attribute)
         * [and](#and)
         * [or](#or)
         * [not](#not)
-    * [Example Config](#example-Config)
+    * [Example Config](#example-config)
     * [Extension](#extension)
     * [Todo](#todo)
 
@@ -461,6 +461,7 @@ To do this, you must implement an own de.neofonie.cinderella.core.counter.Counte
 - after a defined number of requests, every request will render no response (and return only the status code)
  This is to avoid too penetrant clients.
 - Now you can define 2 files in CinderellaXmlConfigLoaderFactory
+- [hostName](#hostname) and [userAgent](#useragent) Conditions added
 
 ### 1.1.0
 
