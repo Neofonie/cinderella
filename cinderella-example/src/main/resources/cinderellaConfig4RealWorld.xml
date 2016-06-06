@@ -52,16 +52,16 @@
 
     </whitelist>
     <rules>
-        <rule id="ip" identifierType="IP" requests="30" minutes="30">
-            <session session="false"/>
+        <rule id="ip" identifierType="IP" requests="3" minutes="5">
+        <session session="false"/>
         </rule>
-        <rule id="session" identifierType="SESSION" requests="120" minutes="30">
-            <session session="true"/>
+        <rule id="session" identifierType="SESSION" requests="90" minutes="5">
+        <session session="true"/>
         </rule>
 
         <!-- Blacklist user which claims to be a whitelisted search spider -->
-        <rule id="noCrawler" identifierType="IP" requests="3" minutes="30">
-            <or>
+        <rule id="noCrawler" identifierType="IP" requests="3" minutes="5">
+        <or>
                 <userAgent>Googlebot</userAgent>
                 <userAgent>\QYahoo! Slurp\E</userAgent>
                 <userAgent>bingbot</userAgent>
