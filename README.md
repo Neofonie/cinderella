@@ -24,14 +24,17 @@ Table of Contents
       * [Whitelist](#whitelist)
       * [Conditions](#conditions)
         * [ip](#ip)
+        * [hostName](#hostName)
         * [session](#session)
         * [requestPath](#requestPath)
         * [param](#param)
         * [header](#header)
+        * [userAgent](#userAgent)
         * [attribute](#attribute)
         * [and](#and)
         * [or](#or)
         * [not](#not)
+    * [Example Config](#example-Config)
     * [Extension](#extension)
     * [Todo](#todo)
 
@@ -250,6 +253,16 @@ The Request-IP will be extracted from:
 
 The first value in this order will be used.
 
+#### hostName
+ 
+Checks, if a reverse lookup of the request-ip matched a hostname.
+
+Examples:
+```XML
+<hostName>googlebot.com$</hostName>
+```
+The Request-IP will be extracted from [ip](#ip)
+
 #### session
 
 Checks, if the request sends a valid session id. 
@@ -296,6 +309,23 @@ Examples:
 ```XML
 <header name="a">^[0-9]+$</param>
 <header name="a">^\Q/foobar\E$</param>
+```
+
+#### userAgent
+checks, if the request-header "User-Agent" matched a [regex-pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html).
+
+Examples:
+```XML
+<userAgent>Googlebot</userAgent>
+<userAgent>\QYahoo! Slurp\E</userAgent>
+```
+
+This is a shorthand for
+
+Examples:
+```XML
+<header name="User-Agent">Googlebot</header>
+<header name="User-Agent">\QYahoo! Slurp\E</header>
 ```
 
 #### attribute
@@ -365,7 +395,7 @@ is equal to
 </not>
 ```
 
-### Full Example
+### Example Config
 
 ```XML
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
