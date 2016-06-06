@@ -1,6 +1,7 @@
 # cinderella
 
 ![travis-ci.org Build-Status](https://travis-ci.org/Neofonie/cinderella.svg?branch=master)
+[ ![Download](https://api.bintray.com/packages/moeth/maven/Cinderella/images/download.svg) ](https://bintray.com/moeth/maven/Cinderella/_latestVersion)
 
 cinderella is a java-framework to reject bad web-request (accordingly to the equal named fairy tale). 
 Its possible to define rules, which requests should be avoided and which not. 
@@ -56,7 +57,7 @@ There is a full runable example under https://github.com/Neofonie/cinderella/tre
 <dependency>
   <groupId>de.neofonie.cinderella</groupId>
   <artifactId>cinderella-core</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 </dependency>
 ```
 
