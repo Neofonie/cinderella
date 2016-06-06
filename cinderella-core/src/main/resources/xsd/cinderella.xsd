@@ -48,6 +48,8 @@
                 <xs:element name="session" type="cinderella:session"/>
                 <xs:element name="ip" type="cinderella:ipCondition"/>
                 <xs:element name="header" type="cinderella:requestHeaderCondition"/>
+                <xs:element name="hostName" type="cinderella:hostNameCondition"/>
+                <xs:element name="userAgent" type="cinderella:userAgentCondition"/>
                 <xs:element name="param" type="cinderella:paramCondition"/>
                 <xs:element name="attribute" type="cinderella:attributeCondition"/>
             </xs:choice>
@@ -113,6 +115,14 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+
+    <xs:simpleType name="hostNameCondition">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="userAgentCondition">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
 
     <xs:complexType name="paramCondition">
         <xs:simpleContent>

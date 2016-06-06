@@ -45,6 +45,8 @@ public abstract class ConditionList {
             @XmlElement(name = "session", type = Session.class),
             @XmlElement(name = "ip", type = IpCondition.class),
             @XmlElement(name = "header", type = RequestHeaderCondition.class),
+            @XmlElement(name = "hostName", type = HostNameCondition.class),
+            @XmlElement(name = "userAgent", type = UserAgentCondition.class),
             @XmlElement(name = "param", type = ParamCondition.class),
             @XmlElement(name = "attribute", type = AttributeCondition.class)
     })

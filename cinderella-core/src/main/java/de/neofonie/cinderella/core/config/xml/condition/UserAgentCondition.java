@@ -29,41 +29,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.regex.Pattern;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RequestHeaderCondition implements Condition {
+public class UserAgentCondition implements Condition {
 
-    @NotNull
-    @XmlAttribute(required = true)
-    private String name;
     @NotNull
     @XmlJavaTypeAdapter(PatternTypeAdapter.class)
     @XmlValue
     private Pattern value;
 
-    public RequestHeaderCondition() {
+    public UserAgentCondition() {
     }
 
-    public RequestHeaderCondition(String name, Pattern value) {
-        this.name = name;
+    public UserAgentCondition(String name, Pattern value) {
         this.value = value;
     }
 
     @Override
     public boolean matches(HttpServletRequest request) {
-        return RequestUtil.matchHeader(request, name, value);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return RequestUtil.matchHeader(request, "User-Agent", value);
     }
 
     public Pattern getValue() {
@@ -76,9 +63,8 @@ public class RequestHeaderCondition implements Condition {
 
     @Override
     public String toString() {
-        return "RequestHeaderCondition{" +
-                "name='" + name + '\'' +
-                ", value=" + value +
+        return "UserAgentCondition{" +
+                "value=" + value +
                 '}';
     }
 }

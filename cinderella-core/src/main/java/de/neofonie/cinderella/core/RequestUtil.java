@@ -32,13 +32,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public final class RequestUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
-    private final static CacheLoader<String, String> HOSTNAME_CACHE_LOADER =
+    private static final CacheLoader<String, String> HOSTNAME_CACHE_LOADER =
             new CacheLoader<String, String>() {
                 public String load(String clientIpAddr) {
                     final String hostNameHelper = getHostNameHelper(clientIpAddr);
@@ -48,7 +50,7 @@ public final class RequestUtil {
                     return hostNameHelper;
                 }
             };
-    private final static LoadingCache<String, String> HOSTNAME_CACHE =
+    private static final LoadingCache<String, String> HOSTNAME_CACHE =
             CacheBuilder
                     .newBuilder()
                     .maximumSize(1000)
@@ -125,19 +127,33 @@ public final class RequestUtil {
             InetAddress ia = InetAddress.getByName(clientIpAddr);
             final String canonicalHostName = ia.getCanonicalHostName();
             if (canonicalHostName == null) {
-                logger.info(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
+                logger.debug(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
                 return null;
             }
             final String hostAddress = InetAddress.getByName(canonicalHostName).getHostAddress();
             if (clientIpAddr.equals(hostAddress)) {
-                logger.info(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
+                logger.debug(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
                 return canonicalHostName;
             }
-            logger.info(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
+            logger.debug(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
             return null;
         } catch (UnknownHostException e) {
-            logger.info(e.getMessage());
+            logger.debug(e.getMessage());
             return null;
         }
+    }
+
+    public static boolean matchHeader(HttpServletRequest request, String headerName, Pattern pattern) {
+        Enumeration<String> headers = request.getHeaders(headerName);
+        if (headers == null) {
+            return false;
+        }
+        while (headers.hasMoreElements()) {
+            String v = headers.nextElement();
+            if (pattern.matcher(v).find()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -29,56 +29,33 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.regex.Pattern;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RequestHeaderCondition implements Condition {
+public class HostNameCondition implements Condition {
 
-    @NotNull
-    @XmlAttribute(required = true)
-    private String name;
+    @XmlValue
     @NotNull
     @XmlJavaTypeAdapter(PatternTypeAdapter.class)
-    @XmlValue
-    private Pattern value;
-
-    public RequestHeaderCondition() {
-    }
-
-    public RequestHeaderCondition(String name, Pattern value) {
-        this.name = name;
-        this.value = value;
-    }
+    private Pattern regex;
 
     @Override
     public boolean matches(HttpServletRequest request) {
-        return RequestUtil.matchHeader(request, name, value);
+
+        final String hostName = RequestUtil.getHostName(request);
+        if (hostName == null) {
+            return regex.matcher("").find();
+        }
+        return regex.matcher(hostName).find();
     }
 
-    public String getName() {
-        return name;
+    public Pattern getRegex() {
+        return regex;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Pattern getValue() {
-        return value;
-    }
-
-    public void setValue(Pattern value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "RequestHeaderCondition{" +
-                "name='" + name + '\'' +
-                ", value=" + value +
-                '}';
+    public void setRegex(Pattern regex) {
+        this.regex = regex;
     }
 }

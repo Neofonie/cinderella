@@ -22,6 +22,16 @@ Table of Contents
       * [Overview](#overview)
       * [Rule](#rule)
       * [Whitelist](#whitelist)
+      * [Conditions](#conditions)
+        * [ip](#ip)
+        * [session](#session)
+        * [requestPath](#requestPath)
+        * [param](#param)
+        * [header](#header)
+        * [attribute](#attribute)
+        * [and](#and)
+        * [or](#or)
+        * [not](#not)
     * [Extension](#extension)
     * [Todo](#todo)
 
@@ -173,6 +183,9 @@ So for production use "classpath:cinderellaConfig.xml" should be replaced with p
 The rules config contains currently 3 parts.
 
 * the time in minutes, for which IP/SessionIds are black/whitelisted
+* noResponseThreshould: the amount of requests, which where redirected to the captcha-site. 
+After this, there will be no result rendered. Only the HTTP-Status will be sent. 
+To disable this feature, omit the attribute or set it to 0.
 * a list of conditions, which should be ever whitelisted (that should contain google-IPs, Client-Names, ...)
 * a list of rules
 
@@ -181,7 +194,7 @@ The rules config contains currently 3 parts.
 <cinderellaXmlConfig xmlns="http://www.neofonie.de/xsd/cinderella.xsd"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:schemaLocation="http://www.neofonie.de/xsd/cinderella.xsd https://raw.githubusercontent.com/Neofonie/cinderella/master/cinderella-core/src/main/resources/xsd/cinderella.xsd"
-                     whitelistMinutes="3" blacklistMinutes="3">
+                     whitelistMinutes="3" blacklistMinutes="3" noResponseThreshould="10">
     <whitelist>
         Whitelist section... 
     </whitelist>
@@ -208,11 +221,15 @@ If the request doesnt contain a SessionId, these rules will be ignored.
 
 for Details, look at [cinderella.xsd](https://raw.githubusercontent.com/Neofonie/cinderella/master/cinderella-core/src/main/resources/xsd/cinderella.xsd)
 
-#### Conditions
+### Whitelist
+ 
+Here the same conditions as for Rules can be used. The difference is, that only one rule must match to identifiy the request as whitelisted one. 
+
+### Conditions
 
 Conditions are used in Rules and the Whitelist. There exists some predefined rules.
 
-##### ip
+#### ip
  
 Checks, if the request-ip is a defined IP or IP-Range.
 
@@ -233,7 +250,7 @@ The Request-IP will be extracted from:
 
 The first value in this order will be used.
 
-##### session
+#### session
 
 Checks, if the request sends a valid session id. 
 
@@ -243,7 +260,7 @@ Examples:
 <session session="false"/>
 ```
 
-##### requestPath
+#### requestPath
 
 checks, if the request (see [request.getRequestURI()](https://tomcat.apache.org/tomcat-7.0-doc/servletapi/javax/servlet/http/HttpServletRequest.html#getRequestURI()))
  matches a specific [regex-pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html).
@@ -259,7 +276,7 @@ Examples:
 <requestPath>^\Q/foobar\E$</requestPath>
 ```
 
-##### param
+#### param
 checks, if the request contains a request-param with a specific value. If more than one param with the name exists, all will be checked (for example in the querystring ?a=1&a=2&b=4).
 
 The param-name is a id, but the value is any [regex-pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html).
@@ -270,7 +287,7 @@ Examples:
 <param name="a">^\Q/foobar\E$</param>
 ```
 
-##### header
+#### header
 checks, if the request contains a request-header with a specific value. If more than one header with the name exists, all will be checked.
 
 The param-name is a id, but the value is any [regex-pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html).
@@ -281,7 +298,7 @@ Examples:
 <header name="a">^\Q/foobar\E$</param>
 ```
 
-##### attribute
+#### attribute
 
 checks, if the request contains a request-attribute with a specific value. This can only occur, if a previous filter set this attribute.
 So this is a option to implement own extentions. There Request-Attribute should be a String or implement a proper toString-Method.
@@ -294,7 +311,7 @@ Examples:
 <attribute name="a">^\Q/foobar\E$</param>
 ```
 
-##### and
+#### and
 
 A logical Operation - doesnt match, if any contained condition doesnt match, otherwise this condition match too. Conditions directly in a rule behaves equal to a and-list. 
 
@@ -306,7 +323,7 @@ Examples:
 </and>
 ```
 
-##### or
+#### or
 
 A logical Operation - match, if any contained condition match, otherwise this condition dont match. This is the same behaviour in the whitelist-conditions.
 
@@ -318,7 +335,7 @@ Examples:
 </or>
 ```
 
-##### not
+#### not
 
 A logical Operation - doesnt match, if any contained condition match, otherwise this condition matches.
 
@@ -348,9 +365,22 @@ is equal to
 </not>
 ```
 
-### Whitelist
- 
-Here the same conditions as for Rules can be used. The difference is, that only one rule must match to identifiy the request as whitelisted one. 
+### Full Example
+
+```XML
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cinderellaXmlConfig xmlns="http://www.neofonie.de/xsd/cinderella.xsd"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://www.neofonie.de/xsd/cinderella.xsd https://raw.githubusercontent.com/Neofonie/cinderella/master/cinderella-core/src/main/resources/xsd/cinderella.xsd"
+                     whitelistMinutes="3" blacklistMinutes="3" noResponseThreshould="10">
+    <whitelist>
+        Whitelist section... 
+    </whitelist>
+    <rules>
+        Rules ...
+    </rules>
+</cinderellaXmlConfig>
+```
 
 ## Extension
 
@@ -358,6 +388,12 @@ For production use, the datastore should be exchanged from an in-memory model to
 To do this, you must implement an own de.neofonie.cinderella.core.counter.Counter Service and declare this as spring-bean.
 
 ## Changes
+
+### 1.2.0
+
+- after a defined number of requests, every request will render no response (and return only the status code)
+ This is to avoid too penetrant clients.
+- Now you can define 2 files in CinderellaXmlConfigLoaderFactory
 
 ### 1.1.0
 
