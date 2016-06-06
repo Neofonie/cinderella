@@ -402,7 +402,7 @@ is equal to
 <cinderellaXmlConfig xmlns="http://www.neofonie.de/xsd/cinderella.xsd"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xsi:schemaLocation="http://www.neofonie.de/xsd/cinderella.xsd ../../../../cinderella-core/src/main/resources/xsd/cinderella.xsd"
-                     whitelistMinutes="30" blacklistMinutes="30" noResponseThreshould="10">
+                     whitelistMinutes="30" blacklistMinutes="60" noResponseThreshould="10">
     <whitelist>
         <requestPath>^/favicon.ico$</requestPath>
         <requestPath>^/whitelist$</requestPath>
