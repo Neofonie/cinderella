@@ -39,7 +39,7 @@ public class FixedTimeMap<K, V> {
     private static final ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            Thread thread = new Thread();
+            Thread thread = new Thread(r);
             thread.setName("MemoryCounter-Cleanup");
             thread.setDaemon(true);
             thread.setPriority(Thread.MIN_PRIORITY);
