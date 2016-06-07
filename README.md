@@ -411,8 +411,8 @@ is equal to
         <and>
             <userAgent>Googlebot</userAgent>
             <or>
-                <hostName>googlebot.com$</hostName>
-                <hostName>google.com$</hostName>
+                <hostName>\Qgooglebot.com\E$</hostName>
+                <hostName>\Qgoogle.com\E$</hostName>
             </or>
         </and>
 
@@ -420,13 +420,13 @@ is equal to
         <!--Yahoo crawlers will end with crawl.yahoo.net like in llf520064.crawl.yahoo.net.-->
         <and>
             <userAgent>\QYahoo! Slurp\E</userAgent>
-            <hostName>crawl.yahoo.net$</hostName>
+            <hostName>\Qcrawl.yahoo.net\E$</hostName>
         </and>
 
         <!-- https://www.bing.com/webmaster/help/verifying-that-bingbot-is-bingbot-3905dc26 -->
         <and>
-            <userAgent>bingbot</userAgent>
-            <hostName>search.msn.com$</hostName>
+            <userAgent>\Qbingbot\E</userAgent>
+            <hostName>\Qsearch.msn.com\E$</hostName>
         </and>
 
     </whitelist>
@@ -441,9 +441,9 @@ is equal to
         <!-- Blacklist user which claims to be a whitelisted search spider -->
         <rule id="noCrawler" identifierType="IP" requests="3" minutes="5">
             <or>
-                <userAgent>Googlebot</userAgent>
+                <userAgent>\QGooglebot\E</userAgent>
                 <userAgent>\QYahoo! Slurp\E</userAgent>
-                <userAgent>bingbot</userAgent>
+                <userAgent>\Qbingbot\E</userAgent>
             </or>
         </rule>
     </rules>

@@ -31,8 +31,8 @@
         <and>
             <userAgent>Googlebot</userAgent>
             <or>
-                <hostName>googlebot.com$</hostName>
-                <hostName>google.com$</hostName>
+                <hostName>\Qgooglebot.com\E$</hostName>
+                <hostName>\Qgoogle.com\E$</hostName>
             </or>
         </and>
 
@@ -40,13 +40,13 @@
         <!--Yahoo crawlers will end with crawl.yahoo.net like in llf520064.crawl.yahoo.net.-->
         <and>
             <userAgent>\QYahoo! Slurp\E</userAgent>
-            <hostName>crawl.yahoo.net$</hostName>
+            <hostName>\Qcrawl.yahoo.net\E$</hostName>
         </and>
 
         <!-- https://www.bing.com/webmaster/help/verifying-that-bingbot-is-bingbot-3905dc26 -->
         <and>
-            <userAgent>bingbot</userAgent>
-            <hostName>search.msn.com$</hostName>
+            <userAgent>\Qbingbot\E</userAgent>
+            <hostName>\Qsearch.msn.com\E$</hostName>
         </and>
 
     </whitelist>
