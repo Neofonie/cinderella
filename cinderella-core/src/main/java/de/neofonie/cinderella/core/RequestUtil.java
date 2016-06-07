@@ -53,8 +53,8 @@ public final class RequestUtil {
     private static final LoadingCache<String, String> HOSTNAME_CACHE =
             CacheBuilder
                     .newBuilder()
-                    .maximumSize(1000)
-                    .expireAfterWrite(30, TimeUnit.MINUTES)
+                    .maximumSize(10000)
+                    .expireAfterWrite(2, TimeUnit.HOURS)
                     .build(HOSTNAME_CACHE_LOADER);
     private static final String UNKNOWN_HOST = "";
 

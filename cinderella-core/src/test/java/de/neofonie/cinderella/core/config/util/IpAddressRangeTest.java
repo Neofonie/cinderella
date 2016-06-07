@@ -104,5 +104,9 @@ public class IpAddressRangeTest {
         assertFalse(IpAddressRange.valueOf("2001:0db8:85a3:08d3:1319:8a2e:0370:7344-2001:0db8:85a3:09d3:1319:8a2e:0370:7344")
                 .contains(IpAddress.valueOf("127.0.0.1")));
 
+// local IPs - https://de.wikipedia.org/wiki/Private_IP-Adresse
+        assertTrue(IpAddressRange.valueOf("10.0.0.0-10.255.255.255").contains(IpAddress.valueOf("10.32.124.211")));
+        assertTrue(IpAddressRange.valueOf("172.16.0.0-172.31.255.255").contains(IpAddress.valueOf("172.24.10.5")));
+        assertTrue(IpAddressRange.valueOf("192.168.0.0-192.168.255.255").contains(IpAddress.valueOf("192.168.0.1")));
     }
 }
