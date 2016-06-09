@@ -57,6 +57,7 @@ public final class RequestUtil {
                     .expireAfterWrite(2, TimeUnit.HOURS)
                     .build(HOSTNAME_CACHE_LOADER);
     private static final String UNKNOWN_HOST = "";
+    private static final Pattern COMPILE = Pattern.compile(",");
 
     private RequestUtil() {
     }
@@ -76,23 +77,20 @@ public final class RequestUtil {
     }
 
     public static String getClientIpAddr(HttpServletRequest request) {
+        final String clientIpAddrHelper = getClientIpAddrHelper(request);
+        if (clientIpAddrHelper == null) {
+            return null;
+        }
+
+        final String[] split = COMPILE.split(clientIpAddrHelper);
+        if (split.length > 0) {
+            return split[split.length - 1];
+        }
+        return clientIpAddrHelper;
+    }
+
+    private static String getClientIpAddrHelper(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            return ip;
-        }
-        ip = request.getHeader("Proxy-Client-IP");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            return ip;
-        }
-        ip = request.getHeader("WL-Proxy-Client-IP");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            return ip;
-        }
-        ip = request.getHeader("HTTP_CLIENT_IP");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            return ip;
-        }
-        ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
             return ip;
         }

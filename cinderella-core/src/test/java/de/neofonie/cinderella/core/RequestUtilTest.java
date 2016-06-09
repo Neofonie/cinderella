@@ -30,6 +30,40 @@ import static org.testng.Assert.assertEquals;
 public class RequestUtilTest {
 
     @Test
+    public void testIpAddress() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("RemoteAddr");
+//        request.addHeader("X-Forwarded-For", null);
+        assertEquals(RequestUtil.getClientIpAddr(request), "RemoteAddr");
+    }
+
+    @Test
+    public void testIpAddress2() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("RemoteAddr");
+        request.addHeader("X-Forwarded-For", "");
+        assertEquals(RequestUtil.getClientIpAddr(request), "RemoteAddr");
+    }
+
+    @Test
+    public void testIpAddress3() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("RemoteAddr");
+        request.addHeader("X-Forwarded-For", "66.249.66.1");
+        assertEquals(RequestUtil.getClientIpAddr(request), "66.249.66.1");
+        assertEquals(RequestUtil.getHostName(request), "crawl-66-249-66-1.googlebot.com");
+    }
+
+    @Test
+    public void testIpAddress4() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("RemoteAddr");
+        request.addHeader("X-Forwarded-For", "192.168.0.1,66.249.66.1");
+        assertEquals(RequestUtil.getClientIpAddr(request), "66.249.66.1");
+        assertEquals(RequestUtil.getHostName(request), "crawl-66-249-66-1.googlebot.com");
+    }
+
+    @Test
     public void testGetHostName() throws Exception {
         final MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("127.0.0.1");
@@ -48,7 +82,6 @@ public class RequestUtilTest {
 
         request.setRemoteAddr("crap");
         assertEquals(RequestUtil.getHostName(request), null);
-
     }
 
     @Test
