@@ -66,7 +66,6 @@ public final class RequestUtil {
     private static Pattern PATTERN_IP_ADDRESSES = Pattern.compile(
             "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})");
 
-
     private RequestUtil() {
     }
 
@@ -85,11 +84,14 @@ public final class RequestUtil {
     }
 
     public static String getClientIpAddr(HttpServletRequest request) {
-        final String clientIpAddrHelper = getClientIpAddrHelper(request);
-        if (clientIpAddrHelper == null) {
-            return null;
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+            String publicIpByForwardedString = getPublicIpByForwardedString(ip);
+            if (publicIpByForwardedString != null) {
+                return publicIpByForwardedString;
+            }
         }
-        return getPublicIpByForwardedString(clientIpAddrHelper);
+        return request.getRemoteAddr();
     }
 
     private static String getPublicIpByForwardedString(String ipAddresses) {
@@ -144,14 +146,6 @@ public final class RequestUtil {
         } else {
             return true;
         }
-    }
-
-    private static String getClientIpAddrHelper(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            return ip;
-        }
-        return request.getRemoteAddr();
     }
 
     public static String getHostName(HttpServletRequest request) {

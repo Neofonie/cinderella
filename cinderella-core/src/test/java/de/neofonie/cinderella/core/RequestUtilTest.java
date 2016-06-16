@@ -26,9 +26,16 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
 
 public class RequestUtilTest {
+
+    @Test
+    public void testIpAddress123() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("RemoteAddr");
+//        request.addHeader("X-Forwarded-For", null);
+        assertEquals(RequestUtil.getClientIpAddr(request), "RemoteAddr");
+    }
 
     @Test
     public void testIpAddress() throws Exception {
@@ -127,7 +134,7 @@ public class RequestUtilTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("10.4.5.6");
         request.addHeader("X-Forwarded-For", "172.16.0.0, 10.255.0.0, 192.168.0.0");
-        assertNull(RequestUtil.getClientIpAddr(request));
-        assertNull(RequestUtil.getHostName(request));
+        assertEquals(RequestUtil.getClientIpAddr(request), "10.4.5.6");
+        assertEquals(RequestUtil.getHostName(request), "10.4.5.6");
     }
 }
