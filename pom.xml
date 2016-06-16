@@ -26,7 +26,7 @@
 
     <groupId>de.neofonie.cinderella</groupId>
     <artifactId>cinderella-parent</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.5.1</version>
     <packaging>pom</packaging>
 
     <name>cinderella-parent</name>
@@ -45,7 +45,7 @@
         <connection>scm:git:https://github.com/Neofonie/cinderella.git</connection>
         <developerConnection>scm:git:https://github.com/Neofonie/cinderella.git</developerConnection>
         <url>https://github.com/Neofonie/cinderella</url>
-        <tag>HEAD</tag>
+        <tag>cinderella-parent-1.5.1</tag>
     </scm>
 
     <distributionManagement>
