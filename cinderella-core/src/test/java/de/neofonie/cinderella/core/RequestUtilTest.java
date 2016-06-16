@@ -26,23 +26,23 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 public class RequestUtilTest {
 
     @Test
     public void testIpAddress() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRemoteAddr("RemoteAddr");
-//        request.addHeader("X-Forwarded-For", null);
-        assertEquals(RequestUtil.getClientIpAddr(request), "RemoteAddr");
+        request.setRemoteAddr("178.255.215.98");
+        assertEquals(RequestUtil.getClientIpAddr(request), "178.255.215.98");
     }
 
     @Test
     public void testIpAddress2() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRemoteAddr("RemoteAddr");
+        request.setRemoteAddr("178.255.215.98");
         request.addHeader("X-Forwarded-For", "");
-        assertEquals(RequestUtil.getClientIpAddr(request), "RemoteAddr");
+        assertEquals(RequestUtil.getClientIpAddr(request), "178.255.215.98");
     }
 
     @Test
@@ -71,7 +71,6 @@ public class RequestUtilTest {
         assertEquals(RequestUtil.getHostName(request), "localhost");
 
         request.setRemoteAddr("66.249.66.1");
-//        request.setRemoteAddr("66.247.66.1");
         assertEquals(RequestUtil.getHostName(request), "crawl-66-249-66-1.googlebot.com");
 
         request.setRemoteAddr("66.247.66.1");
@@ -94,5 +93,41 @@ public class RequestUtilTest {
         assertEquals(RequestUtil.getHostNameHelper("127.0.0.1"), "localhost");
         assertEquals(RequestUtil.getHostNameHelper(null), null);
         assertEquals(RequestUtil.getHostNameHelper("crap"), null);
+    }
+
+    @Test
+    public void testXforwardedForIpListWithGoogleAndBlanks() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("RemoteAddr");
+        request.addHeader("X-Forwarded-For", " 193.99.144.80 , 66.249.66.1 ");
+        assertEquals(RequestUtil.getClientIpAddr(request), "66.249.66.1");
+        assertEquals(RequestUtil.getHostName(request), "crawl-66-249-66-1.googlebot.com");
+    }
+
+    @Test
+    public void testXforwardedForIpListWithGoogle() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("RemoteAddr");
+        request.addHeader("X-Forwarded-For", "193.99.144.80, 66.249.66.1");
+        assertEquals(RequestUtil.getClientIpAddr(request), "66.249.66.1");
+        assertEquals(RequestUtil.getHostName(request), "crawl-66-249-66-1.googlebot.com");
+    }
+
+    @Test
+    public void testXforwardedForIpListWithGoogleAndPrivateIps() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("RemoteAddr");
+        request.addHeader("X-Forwarded-For", " 193.99.144.80 , 66.249.66.1 , 172.16.0.0, 10.255.0.0, 192.168.0.0");
+        assertEquals(RequestUtil.getClientIpAddr(request), "66.249.66.1");
+        assertEquals(RequestUtil.getHostName(request), "crawl-66-249-66-1.googlebot.com");
+    }
+
+    @Test
+    public void testXforwardedOnlyPrivateIps() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("10.4.5.6");
+        request.addHeader("X-Forwarded-For", "172.16.0.0, 10.255.0.0, 192.168.0.0");
+        assertNull(RequestUtil.getClientIpAddr(request));
+        assertNull(RequestUtil.getHostName(request));
     }
 }

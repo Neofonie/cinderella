@@ -1,167 +1,161 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cinderella="http://www.neofonie.de/xsd/cinderella.xsd"
-           attributeFormDefault="unqualified" elementFormDefault="qualified"
-           targetNamespace="http://www.neofonie.de/xsd/cinderella.xsd" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cinderella="http://www.neofonie.de/xsd/cinderella.xsd" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.neofonie.de/xsd/cinderella.xsd" version="1.0">
 
-    <xs:element name="cinderellaXmlConfig" type="cinderella:cinderellaXmlConfig"/>
+  <xs:element name="cinderellaXmlConfig" type="cinderella:cinderellaXmlConfig"/>
 
-    <xs:element name="requestPath" type="cinderella:requestPath"/>
+  <xs:element name="requestPath" type="cinderella:requestPath"/>
 
-    <xs:complexType name="cinderellaXmlConfig">
-        <xs:sequence>
-            <xs:element minOccurs="0" name="whitelist" type="cinderella:whitelist"/>
-            <xs:element minOccurs="0" name="rules">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="rule" type="cinderella:rule"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute name="whitelistMinutes" type="xs:long" use="required"/>
-        <xs:attribute name="blacklistMinutes" type="xs:long" use="required"/>
-        <xs:attribute name="noResponseThreshould" type="xs:long"/>
-    </xs:complexType>
+  <xs:complexType name="cinderellaXmlConfig">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="whitelist" type="cinderella:whitelist"/>
+      <xs:element minOccurs="0" name="rules">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="rule" type="cinderella:rule"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="whitelistMinutes" type="xs:long" use="required"/>
+    <xs:attribute name="blacklistMinutes" type="xs:long" use="required"/>
+    <xs:attribute name="noResponseThreshould" type="xs:long"/>
+  </xs:complexType>
 
-    <xs:complexType name="whitelist">
-        <xs:annotation>
-            <xs:documentation>
-                <![CDATA[A list of Conditions. If at least one condition matches, the request will be ignored for ddos-scanning. The List is also equal to {@link de.neofonie.cinderella.core.config.xml.condition.OrCondition}.]]></xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="cinderella:conditionList">
-                <xs:sequence/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType abstract="true" name="conditionList">
-        <xs:annotation>
-            <xs:documentation><![CDATA[abstract class containing a list of conditions]]></xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:choice maxOccurs="unbounded" minOccurs="0">
-                <xs:element ref="cinderella:requestPath"/>
-                <xs:element name="and" type="cinderella:andCondition"/>
-                <xs:element name="or" type="cinderella:orCondition"/>
-                <xs:element name="not" type="cinderella:notCondition"/>
-                <xs:element name="session" type="cinderella:session"/>
-                <xs:element name="ip" type="cinderella:ipCondition"/>
-                <xs:element name="header" type="cinderella:requestHeaderCondition"/>
-                <xs:element name="hostName" type="cinderella:hostNameCondition"/>
-                <xs:element name="userAgent" type="cinderella:userAgentCondition"/>
-                <xs:element name="param" type="cinderella:paramCondition"/>
-                <xs:element name="attribute" type="cinderella:attributeCondition"/>
-            </xs:choice>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:simpleType name="requestPath">
-        <xs:restriction base="xs:string"/>
-    </xs:simpleType>
-
-    <xs:complexType name="andCondition">
-        <xs:annotation>
-            <xs:documentation>
-                <![CDATA[matches if all condition matches. If empty, it ever matches.]]></xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="cinderella:conditionList">
-                <xs:sequence/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="orCondition">
-        <xs:annotation>
-            <xs:documentation>
-                <![CDATA[matches if any condition matches. If empty, it never matches.]]></xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="cinderella:conditionList">
-                <xs:sequence/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="notCondition">
-        <xs:annotation>
-            <xs:documentation>
-                <![CDATA[matches if all condition matches. If empty, it ever matches.]]></xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="cinderella:conditionList">
-                <xs:sequence/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="session">
-        <xs:annotation>
-            <xs:documentation><![CDATA[Checks if the user has a session.]]></xs:documentation>
-        </xs:annotation>
+  <xs:complexType name="whitelist">
+    <xs:annotation>
+      <xs:documentation><![CDATA[A list of Conditions. If at least one condition matches, the request will be ignored for ddos-scanning. The List is also equal to {@link de.neofonie.cinderella.core.config.xml.condition.OrCondition}.]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cinderella:conditionList">
         <xs:sequence/>
-        <xs:attribute name="session" type="xs:boolean" use="required"/>
-    </xs:complexType>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
-    <xs:simpleType name="ipCondition">
-        <xs:restriction base="xs:string"/>
-    </xs:simpleType>
+  <xs:complexType abstract="true" name="conditionList">
+    <xs:annotation>
+      <xs:documentation><![CDATA[abstract class containing a list of conditions]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded" minOccurs="0">
+        <xs:element ref="cinderella:requestPath"/>
+        <xs:element name="and" type="cinderella:andCondition"/>
+        <xs:element name="or" type="cinderella:orCondition"/>
+        <xs:element name="not" type="cinderella:notCondition"/>
+        <xs:element name="session" type="cinderella:session"/>
+        <xs:element name="ip" type="cinderella:ipCondition"/>
+        <xs:element name="header" type="cinderella:requestHeaderCondition"/>
+        <xs:element name="hostName" type="cinderella:hostNameCondition"/>
+        <xs:element name="userAgent" type="cinderella:userAgentCondition"/>
+        <xs:element name="param" type="cinderella:paramCondition"/>
+        <xs:element name="attribute" type="cinderella:attributeCondition"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
 
-    <xs:complexType name="requestHeaderCondition">
-        <xs:simpleContent>
-            <xs:extension base="xs:string">
-                <xs:attribute name="name" type="xs:string" use="required"/>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
+  <xs:simpleType name="requestPath">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
 
-    <xs:simpleType name="hostNameCondition">
-        <xs:restriction base="xs:string"/>
-    </xs:simpleType>
+  <xs:complexType name="andCondition">
+    <xs:annotation>
+      <xs:documentation><![CDATA[matches if all condition matches. If empty, it ever matches.]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cinderella:conditionList">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
-    <xs:simpleType name="userAgentCondition">
-        <xs:restriction base="xs:string"/>
-    </xs:simpleType>
+  <xs:complexType name="orCondition">
+    <xs:annotation>
+      <xs:documentation><![CDATA[matches if any condition matches. If empty, it never matches.]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cinderella:conditionList">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
-    <xs:complexType name="paramCondition">
-        <xs:simpleContent>
-            <xs:extension base="xs:string">
-                <xs:attribute name="name" type="xs:string" use="required"/>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
+  <xs:complexType name="notCondition">
+    <xs:annotation>
+      <xs:documentation><![CDATA[matches if all condition matches. If empty, it ever matches.]]></xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cinderella:conditionList">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
-    <xs:complexType name="attributeCondition">
-        <xs:simpleContent>
-            <xs:extension base="xs:string">
-                <xs:attribute name="name" type="xs:string" use="required"/>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
+  <xs:complexType name="session">
+    <xs:annotation>
+      <xs:documentation><![CDATA[Checks if the user has a session.]]></xs:documentation>
+    </xs:annotation>
+    <xs:sequence/>
+    <xs:attribute name="session" type="xs:boolean" use="required"/>
+  </xs:complexType>
 
-    <xs:complexType name="rule">
-        <xs:annotation>
-            <xs:documentation><![CDATA[if all conditions matches and the {@link IdentifierType} is valid for the current request, the counter for this rule will be increased.
+  <xs:simpleType name="ipCondition">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:complexType name="requestHeaderCondition">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="hostNameCondition">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="userAgentCondition">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:complexType name="paramCondition">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="attributeCondition">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="rule">
+    <xs:annotation>
+      <xs:documentation><![CDATA[if all conditions matches and the {@link IdentifierType} is valid for the current request, the counter for this rule will be increased.
 If then the counter is greater than {@linkplain requests} in the last {@link minutes}, the request will be regarded as DDOS.
 After {@link minutes}, the counter will be reseted to zero.
 The {@link id} must be unique for all rules. If the id for a rule is changed, the counter will be lost or the counter of another, former rule could be used.]]></xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="cinderella:conditionList">
-                <xs:sequence/>
-                <xs:attribute name="id" type="xs:string" use="required"/>
-                <xs:attribute name="identifierType" type="cinderella:identifierType" use="required"/>
-                <xs:attribute name="requests" type="xs:long" use="required"/>
-                <xs:attribute name="minutes" type="xs:long" use="required"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cinderella:conditionList">
+        <xs:sequence/>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+        <xs:attribute name="identifierType" type="cinderella:identifierType" use="required"/>
+        <xs:attribute name="requests" type="xs:long" use="required"/>
+        <xs:attribute name="minutes" type="xs:long" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
-    <xs:simpleType name="identifierType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="IP"/>
-            <xs:enumeration value="SESSION"/>
-        </xs:restriction>
-    </xs:simpleType>
+  <xs:simpleType name="identifierType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SESSION"/>
+      <xs:enumeration value="IP"/>
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>

@@ -33,8 +33,10 @@ import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class RequestUtil {
@@ -58,6 +60,12 @@ public final class RequestUtil {
                     .build(HOSTNAME_CACHE_LOADER);
     private static final String UNKNOWN_HOST = "";
     private static final Pattern COMPILE = Pattern.compile(",");
+    private static Pattern PATERN_IP_ADDRESS = Pattern.compile(
+            "^[ \\t]*(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})[, \\t]*$");
+
+    private static Pattern PATTERN_IP_ADDRESSES = Pattern.compile(
+            "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})");
+
 
     private RequestUtil() {
     }
@@ -81,12 +89,61 @@ public final class RequestUtil {
         if (clientIpAddrHelper == null) {
             return null;
         }
+        return getPublicIpByForwardedString(clientIpAddrHelper);
+    }
 
-        final String[] split = COMPILE.split(clientIpAddrHelper);
-        if (split.length > 0) {
-            return split[split.length - 1];
+    private static String getPublicIpByForwardedString(String ipAddresses) {
+        if (ipAddresses == null) {
+            return null;
         }
-        return clientIpAddrHelper;
+
+        final Matcher matcher = PATTERN_IP_ADDRESSES.matcher(ipAddresses);
+
+        // We have to check the addresses from back to front
+        // but the matcher matches from left to right
+        // ... hence a stack
+        // 129.33.22.3, 10.2.1.1, 192.168.1.2 --> so 192.168.1.2 first
+
+        Stack<String> stackOfAddresses = new Stack<String>();
+
+        while (matcher.find()) {
+            stackOfAddresses.push(matcher.group(1).trim());
+        }
+
+        String ret = null;
+        while (!stackOfAddresses.empty()) {
+            ret = stackOfAddresses.pop().trim();
+            if (!isPrivateIP(ret)) {
+                return ret;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isPrivateIP(String ip) {
+        if (ip == null || ip.isEmpty()) {
+            return false;
+        }
+
+        final Matcher matcher = PATERN_IP_ADDRESS.matcher(ip);
+        if (matcher.matches()) {
+            int first = Integer.parseInt(matcher.group(1));
+            int second = Integer.parseInt(matcher.group(2));
+
+            return
+                    // 10.0.0.0 - 10.255.255.255
+                    first == 10
+                            // 172.16.0.0 - 172.31.255.255
+                            || first == 172 && second >= 16 && second <= 31
+                            // 192.168.0.0 - 192.168.255.255
+                            || first == 192 && second == 168
+                            // 224.x.x.x
+                            || first == 224
+                            // 169.254.x.x
+                            || first == 169 && second == 254;
+        } else {
+            return true;
+        }
     }
 
     private static String getClientIpAddrHelper(HttpServletRequest request) {
