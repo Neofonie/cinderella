@@ -27,12 +27,14 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xbill.DNS.Address;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -41,25 +43,57 @@ import java.util.regex.Pattern;
 
 public final class RequestUtil {
 
+    private static final class HostnameCacheEntryKey {
+        String iPAddress;
+        boolean ignoreForwardDnsLookup;
+
+        public HostnameCacheEntryKey(String iPAddress, boolean ignoreForwardDnsLookup) {
+            this.iPAddress = iPAddress;
+            this.ignoreForwardDnsLookup = ignoreForwardDnsLookup;
+        }
+
+        public String getiPAddress() {
+            return iPAddress;
+        }
+
+        public boolean isIgnoreForwardDnsLookup() {
+            return ignoreForwardDnsLookup;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof HostnameCacheEntryKey)) return false;
+            HostnameCacheEntryKey that = (HostnameCacheEntryKey) o;
+            return ignoreForwardDnsLookup == that.ignoreForwardDnsLookup &&
+                    Objects.equals(iPAddress, that.iPAddress);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(iPAddress, ignoreForwardDnsLookup);
+        }
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
-    private static final CacheLoader<String, String> HOSTNAME_CACHE_LOADER =
-            new CacheLoader<String, String>() {
-                public String load(String clientIpAddr) {
-                    final String hostNameHelper = getHostNameHelper(clientIpAddr);
+    private static final CacheLoader<HostnameCacheEntryKey, String> HOSTNAME_CACHE_LOADER =
+            new CacheLoader<HostnameCacheEntryKey, String>() {
+                public String load(HostnameCacheEntryKey hostnameCacheEntryKey) {
+                    final String hostNameHelper = getHostNameHelper(hostnameCacheEntryKey.getiPAddress(), hostnameCacheEntryKey.isIgnoreForwardDnsLookup());
                     if (hostNameHelper == null) {
                         return UNKNOWN_HOST;
                     }
                     return hostNameHelper;
                 }
             };
-    private static final LoadingCache<String, String> HOSTNAME_CACHE =
+    private static final LoadingCache<HostnameCacheEntryKey, String> HOSTNAME_CACHE =
             CacheBuilder
                     .newBuilder()
                     .maximumSize(10000)
                     .expireAfterWrite(2, TimeUnit.HOURS)
                     .build(HOSTNAME_CACHE_LOADER);
     private static final String UNKNOWN_HOST = "";
-    private static final Pattern COMPILE = Pattern.compile(",");
+
     private static Pattern PATERN_IP_ADDRESS = Pattern.compile(
             "^[ \\t]*(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})[, \\t]*$");
 
@@ -148,13 +182,14 @@ public final class RequestUtil {
         }
     }
 
-    public static String getHostName(HttpServletRequest request) {
+    public static String getHostName(HttpServletRequest request, boolean ignoreForwardDnsLookup) {
         final String clientIpAddr = getClientIpAddr(request);
         if (clientIpAddr == null) {
             return null;
         }
         try {
-            final String host = HOSTNAME_CACHE.get(clientIpAddr);
+            final HostnameCacheEntryKey hostnameCacheEntryKey = new HostnameCacheEntryKey(clientIpAddr, ignoreForwardDnsLookup);
+            final String host = HOSTNAME_CACHE.get(hostnameCacheEntryKey);
             if (UNKNOWN_HOST.equals(host)) {
                 return null;
             }
@@ -165,31 +200,33 @@ public final class RequestUtil {
         }
     }
 
-    static String getHostNameHelper(final String clientIpAddr) {
+    static String getHostNameHelper(final String clientIpAddr, boolean ignoreForwardDnsLookup) {
+        String canonicalHostName = null;
+        final long start = System.nanoTime();
+        if (clientIpAddr != null) {
+            try {
+                InetAddress inetAddress = InetAddress.getByName(clientIpAddr);
+                if (ignoreForwardDnsLookup) {
+                    canonicalHostName = Address.getHostName(inetAddress);
+                    if (".".equals(canonicalHostName.substring(canonicalHostName.length() - 1, canonicalHostName.length()))) {
+                        canonicalHostName = canonicalHostName.substring(0, canonicalHostName.length() - 1);
+                    }
 
-        if (clientIpAddr == null) {
-            return null;
-        }
-
-        try {
-            final long start = System.nanoTime();
-            InetAddress ia = InetAddress.getByName(clientIpAddr);
-            final String canonicalHostName = ia.getCanonicalHostName();
-            if (canonicalHostName == null) {
-                logger.debug(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
-                return null;
+                } else {
+                    canonicalHostName = inetAddress.getCanonicalHostName();
+                    if (canonicalHostName != null) {
+                        final String hostAddress = InetAddress.getByName(canonicalHostName).getHostAddress();
+                        if (!clientIpAddr.equals(hostAddress)) {
+                            canonicalHostName = null;
+                        }
+                    }
+                }
+            } catch (UnknownHostException e) {
+                logger.debug(e.getMessage());
             }
-            final String hostAddress = InetAddress.getByName(canonicalHostName).getHostAddress();
-            if (clientIpAddr.equals(hostAddress)) {
-                logger.debug(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
-                return canonicalHostName;
-            }
-            logger.debug(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
-            return null;
-        } catch (UnknownHostException e) {
-            logger.debug(e.getMessage());
-            return null;
         }
+        logger.debug(String.format("%s - %d ms", clientIpAddr, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)));
+        return canonicalHostName;
     }
 
     public static boolean matchHeader(HttpServletRequest request, String headerName, Pattern pattern) {

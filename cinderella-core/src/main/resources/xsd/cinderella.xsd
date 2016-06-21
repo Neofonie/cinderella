@@ -110,9 +110,13 @@
     </xs:simpleContent>
   </xs:complexType>
 
-  <xs:simpleType name="hostNameCondition">
-    <xs:restriction base="xs:string"/>
-  </xs:simpleType>
+  <xs:complexType name="hostNameCondition">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="ignoreForwardDnsLookup" type="xs:boolean"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="userAgentCondition">
     <xs:restriction base="xs:string"/>
@@ -154,8 +158,8 @@ The {@link id} must be unique for all rules. If the id for a rule is changed, th
 
   <xs:simpleType name="identifierType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="SESSION"/>
       <xs:enumeration value="IP"/>
+      <xs:enumeration value="SESSION"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

@@ -170,6 +170,16 @@ public class CinderellaXmlConfigLoaderFactoryTest {
         assertNotNull(cinderellaConfig);
     }
 
+    @Test
+    public void testLoadSistrix() throws Exception {
+        InputStream testXml = CinderellaXmlConfig.class.getClassLoader().getResourceAsStream("testSistrix.xml");
+        assertNotNull(testXml);
+        CinderellaXmlConfigLoader cinderellaXmlConfigLoader = createCinderellaXmlConfigLoader(new InputStreamResource(testXml), null);
+        CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+        assertNotNull(cinderellaConfig);
+        assertEquals(cinderellaConfig.getBlacklistMinutes(), 60);
+    }
+
     private File createTempFile() throws IOException {
         File tempDirectory = createTempDir();
         tempDirectory.deleteOnExit();

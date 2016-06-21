@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.regex.Pattern;
@@ -41,10 +42,13 @@ public class HostNameCondition implements Condition {
     @XmlJavaTypeAdapter(PatternTypeAdapter.class)
     private Pattern regex;
 
+    @XmlAttribute(required = false)
+    private Boolean ignoreForwardDnsLookup = false;
+
     @Override
     public boolean matches(HttpServletRequest request) {
 
-        final String hostName = RequestUtil.getHostName(request);
+        final String hostName = RequestUtil.getHostName(request, ignoreForwardDnsLookup);
         if (hostName == null) {
             return regex.matcher("").find();
         }
@@ -57,5 +61,13 @@ public class HostNameCondition implements Condition {
 
     public void setRegex(Pattern regex) {
         this.regex = regex;
+    }
+
+    public Boolean getIgnoreForwardDnsLookup() {
+        return ignoreForwardDnsLookup;
+    }
+
+    public void setIgnoreForwardDnsLookup(Boolean ignoreForwardDnsLookup) {
+        this.ignoreForwardDnsLookup = ignoreForwardDnsLookup;
     }
 }

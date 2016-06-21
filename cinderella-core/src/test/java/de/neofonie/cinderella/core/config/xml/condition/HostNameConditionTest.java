@@ -35,18 +35,36 @@ public class HostNameConditionTest {
     @Test
     public void testMatches() throws Exception {
 
-        final MockHttpServletRequest request = new MockHttpServletRequest();
-        final HostNameCondition google = createHostNameCondition("googlebot.com$");
-        final HostNameCondition fooo = createHostNameCondition("fooo.com$");
-        final HostNameCondition localhost = createHostNameCondition("localhost");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        HostNameCondition google = createHostNameCondition("googlebot.com$");
+        HostNameCondition sistrix = createHostNameCondition("sistrix.net$");
+        HostNameCondition fooo = createHostNameCondition("fooo.com$");
+        HostNameCondition localhost = createHostNameCondition("localhost");
+
+        final String sistrixIP = "85.10.196.88";
 
         request.setRemoteAddr("127.0.0.1");
         assertFalse(google.matches(request));
         assertFalse(fooo.matches(request));
+        assertFalse(sistrix.matches(request));
         assertTrue(localhost.matches(request));
 
         request.setRemoteAddr("66.249.66.1");
         assertTrue(google.matches(request));
+        assertFalse(sistrix.matches(request));
+        assertFalse(fooo.matches(request));
+
+
+        request.setRemoteAddr(sistrixIP);
+        sistrix.setIgnoreForwardDnsLookup(false);
+        assertFalse(google.matches(request));
+        assertFalse(fooo.matches(request));
+        assertFalse(sistrix.matches(request));
+
+        request.setRemoteAddr(sistrixIP);
+        sistrix.setIgnoreForwardDnsLookup(true);
+        assertTrue(sistrix.matches(request));
+        assertFalse(google.matches(request));
         assertFalse(fooo.matches(request));
     }
 
