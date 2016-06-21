@@ -195,7 +195,7 @@ public final class RequestUtil {
             }
             return host;
         } catch (ExecutionException e) {
-            logger.error("", e);
+            logger.error(String.format("resolving %s failed", clientIpAddr), e);
             return null;
         }
     }

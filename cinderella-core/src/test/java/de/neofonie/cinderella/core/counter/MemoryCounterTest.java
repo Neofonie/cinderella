@@ -84,7 +84,7 @@ public class MemoryCounterTest {
     private void doWait() {
         synchronized (this) {
             try {
-                wait(1001L);
+                wait(2000L);
             } catch (InterruptedException e) {
                 throw new IllegalStateException(e);
             }
