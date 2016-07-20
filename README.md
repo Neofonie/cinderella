@@ -57,7 +57,7 @@ There is a full runable example under https://github.com/Neofonie/cinderella/tre
 <dependency>
   <groupId>de.neofonie.cinderella</groupId>
   <artifactId>cinderella-core</artifactId>
-  <version>1.2.1</version>
+  <version>1.6.0</version>
 </dependency>
 ```
 
