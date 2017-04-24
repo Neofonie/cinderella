@@ -108,6 +108,19 @@ public class CinderellaServiceImpl implements CinderellaService {
         return result;
     }
 
+    protected void resetBlacklistCount(HttpServletRequest request) {
+        CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+        if (cinderellaConfig == null) {
+            return;
+        }
+        List<Rule> matches = cinderellaConfig.getMatches(request);
+        for (Rule rule : matches) {
+            final String identifier = rule.getIdentifierType().getIdentifier(request);
+            String key = identifier + '_' + rule.getId();
+            counter.resetBlacklistCount(key);
+        }
+    }
+
     @Override
     public void whitelist(HttpServletRequest request) {
         if (!IdentifierType.SESSION.accept(request)) {
@@ -121,5 +134,6 @@ public class CinderellaServiceImpl implements CinderellaService {
             return;
         }
         counter.whitelist(identifier, TimeUnit.MINUTES, cinderellaConfig.getWhitelistMinutes());
+        resetBlacklistCount(request);
     }
 }

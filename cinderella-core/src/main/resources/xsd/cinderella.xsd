@@ -54,6 +54,9 @@
   </xs:complexType>
 
   <xs:simpleType name="requestPath">
+    <xs:annotation>
+      <xs:documentation><![CDATA[matches, if the request-path is like the regex-pattern, see {@link java.util.regex.Pattern}]]></xs:documentation>
+    </xs:annotation>
     <xs:restriction base="xs:string"/>
   </xs:simpleType>
 
@@ -157,6 +160,9 @@ The {@link id} must be unique for all rules. If the id for a rule is changed, th
   </xs:complexType>
 
   <xs:simpleType name="identifierType">
+    <xs:annotation>
+      <xs:documentation><![CDATA[Type, which will be used to identified a user.]]></xs:documentation>
+    </xs:annotation>
     <xs:restriction base="xs:string">
       <xs:enumeration value="IP"/>
       <xs:enumeration value="SESSION"/>

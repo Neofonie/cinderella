@@ -164,6 +164,11 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
 
         }
 
+        @Override
+        public void resetBlacklistCount(String key) {
+            
+        }
+
         public void reset(long waittime) {
             count = 0;
             diff = 0;

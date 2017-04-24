@@ -45,6 +45,11 @@ public class MemoryCounter implements Counter {
         blacklistMap.getOrCreate(key, s -> new AtomicLong(), timeUnit, duration);
     }
 
+    @Override
+    public void resetBlacklistCount(String key) {
+        blacklistMap.remove(key);
+    }
+
     @Deprecated
     public boolean isBlacklisted(String key) {
         return incrementAndGetBlacklistedRequestCount(key) != 0L;
