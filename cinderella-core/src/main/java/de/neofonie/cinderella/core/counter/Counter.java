@@ -48,4 +48,7 @@ public interface Counter {
 
     void resetBlacklistCount(String key);
 
+    void resetCounter(String key);
+
+
 }

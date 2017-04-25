@@ -113,11 +113,12 @@ public class CinderellaServiceImpl implements CinderellaService {
         if (cinderellaConfig == null) {
             return;
         }
-        List<Rule> matches = cinderellaConfig.getMatches(request);
+        List<Rule> matches = cinderellaConfig.getRules();
         for (Rule rule : matches) {
             final String identifier = rule.getIdentifierType().getIdentifier(request);
             String key = identifier + '_' + rule.getId();
-            counter.resetBlacklistCount(key);
+            counter.resetBlacklistCount(identifier);
+            counter.resetCounter(key);
         }
     }
 

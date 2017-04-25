@@ -31,6 +31,8 @@ public interface CinderellaConfig {
 
     List<Rule> getMatches(HttpServletRequest httpServletRequest);
 
+    List<Rule> getRules();
+
     long getBlacklistMinutes();
 
     long getWhitelistMinutes();

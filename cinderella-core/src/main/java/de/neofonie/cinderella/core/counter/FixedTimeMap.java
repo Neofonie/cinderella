@@ -141,9 +141,7 @@ public class FixedTimeMap<K, V> {
     }
 
     public void remove(K key) {
-        if (map.containsKey(key)) {
-            map.remove(key);
-        }
+        map.remove(key);
     }
 
     public Set<Map.Entry<K, Entry<V>>> entrySet() {

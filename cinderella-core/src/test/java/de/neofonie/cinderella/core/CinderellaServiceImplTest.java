@@ -169,6 +169,11 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
             
         }
 
+        @Override
+        public void resetCounter(String key) {
+            
+        }
+
         public void reset(long waittime) {
             count = 0;
             diff = 0;
