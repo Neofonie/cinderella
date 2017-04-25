@@ -27,7 +27,7 @@
     <parent>
         <groupId>de.neofonie.cinderella</groupId>
         <artifactId>cinderella-parent</artifactId>
-        <version>1.7.0-SNAPSHOT</version>
+        <version>1.7.0</version>
     </parent>
 
     <artifactId>cinderella-core</artifactId>
