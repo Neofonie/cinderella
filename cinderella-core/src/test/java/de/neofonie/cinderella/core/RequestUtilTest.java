@@ -96,7 +96,7 @@ public class RequestUtilTest {
         assertEquals(RequestUtil.getHostNameHelper("66.247.66.1", false), "66.247.66.1");
         assertEquals(RequestUtil.getHostNameHelper("66.249.66.1", false), "crawl-66-249-66-1.googlebot.com");
         //should be heise.de?
-        assertEquals(RequestUtil.getHostNameHelper("193.99.144.80", false), "193.99.144.80");
+        assertEquals(RequestUtil.getHostNameHelper("193.99.144.80", false), "redirector.heise.de");
 
         assertEquals(RequestUtil.getHostNameHelper("127.0.0.1", false), "localhost");
         assertEquals(RequestUtil.getHostNameHelper(null, false), null);

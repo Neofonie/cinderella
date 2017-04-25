@@ -81,6 +81,30 @@ public class MemoryCounterTest {
         assertEquals(false, memoryCounter.isWhitelisted(KEY));
     }
 
+    @Test
+    public void testResetCounter() throws Exception {
+        final String KEY = "testResetCounter";
+        assertEquals(memoryCounter.incrementAndGetNormalRequestCount(KEY, TimeUnit.MINUTES, 1L), 1L);
+        assertEquals(memoryCounter.incrementAndGetNormalRequestCount(KEY, TimeUnit.MINUTES, 1L), 2L);
+        assertEquals(memoryCounter.incrementAndGetNormalRequestCount(KEY, TimeUnit.MINUTES, 1L), 3L);
+        memoryCounter.resetCounter(KEY);
+        assertEquals(memoryCounter.incrementAndGetNormalRequestCount(KEY, TimeUnit.MINUTES, 1L), 1L);
+
+    }
+
+    @Test
+    public void testResetBlacklistCount() throws Exception {
+        final String KEY = "testResetBlacklistCount";
+
+        assertEquals(false, memoryCounter.isBlacklisted(KEY));
+
+        memoryCounter.blacklist(KEY, TimeUnit.MINUTES, 1L);
+        assertEquals(true, memoryCounter.isBlacklisted(KEY));
+
+        memoryCounter.resetBlacklistCount(KEY);
+        assertEquals(false, memoryCounter.isBlacklisted(KEY));
+    }
+
     private void doWait() {
         synchronized (this) {
             try {

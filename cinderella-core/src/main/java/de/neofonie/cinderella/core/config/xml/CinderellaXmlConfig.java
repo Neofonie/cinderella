@@ -57,6 +57,7 @@ public class CinderellaXmlConfig implements CinderellaConfig {
     @XmlAttribute(required = false)
     private Long noResponseThreshould;
 
+    @Override
     public List<Rule> getRules() {
         return rules;
     }

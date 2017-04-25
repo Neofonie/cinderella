@@ -55,6 +55,7 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
     @Autowired
     private CinderellaXmlConfigLoader cinderellaXmlConfigLoader;
     private static final Rule rule = new Rule(new ArrayList<>(), "id", IdentifierType.IP, 2, 5);
+    private static final Rule notMatchingRule = new Rule(new ArrayList<>(), "ruleId2", IdentifierType.SESSION, 2, 5);
 
     @Test
     public void testWhitelistSession() throws Exception {
@@ -213,6 +214,30 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
         //Test
         EasyMock.replay(cinderellaConfig, cinderellaXmlConfigLoader, counter);
         assertEquals(ddosService.getAction(request), ActionEnum.DDOS);
+        EasyMock.verify(cinderellaConfig, cinderellaXmlConfigLoader, counter);
+        EasyMock.reset(cinderellaConfig, cinderellaXmlConfigLoader, counter);
+    }
+
+    @Test
+    public void testSetWhitelist() throws Exception {
+
+        CinderellaConfig cinderellaConfig = EasyMock.createMock(CinderellaConfig.class);
+        MockHttpServletRequest request = createMockHttpServletRequest();
+
+        //Init
+        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig).atLeastOnce();
+        counter.resetBlacklistCount("127.0.0.1");
+        counter.resetBlacklistCount("SESSION_ID");
+        counter.resetCounter("127.0.0.1_id");
+        counter.resetCounter("SESSION_ID_ruleId2");
+        EasyMock.expect(cinderellaConfig.getRules()).andReturn(Arrays.asList(rule, notMatchingRule));
+        EasyMock.expect(cinderellaConfig.getWhitelistMinutes()).andReturn(5L);
+        counter.whitelist("SESSION_ID", TimeUnit.MINUTES, 5L);
+
+        //Test
+        EasyMock.replay(cinderellaConfig, cinderellaXmlConfigLoader, counter);
+        ddosService.whitelist(request);
+
         EasyMock.verify(cinderellaConfig, cinderellaXmlConfigLoader, counter);
         EasyMock.reset(cinderellaConfig, cinderellaXmlConfigLoader, counter);
     }

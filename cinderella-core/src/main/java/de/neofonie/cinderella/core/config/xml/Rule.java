@@ -95,4 +95,9 @@ public class Rule extends ConditionList implements Condition {
                 "conditions=" + getConditions().stream().map(s -> s.toString()).collect(Collectors.joining(",")) +
                 '}';
     }
+
+    public String getRuleKey(HttpServletRequest request) {
+        final String identifier = getIdentifierType().getIdentifier(request);
+        return identifier + '_' + getId();
+    }
 }

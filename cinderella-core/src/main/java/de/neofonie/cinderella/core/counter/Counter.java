@@ -44,4 +44,11 @@ public interface Counter {
      * Sets a key as blacklist for the given duration
      */
     void blacklist(String key, TimeUnit timeUnit, long duration);
+
+
+    void resetBlacklistCount(String key);
+
+    void resetCounter(String key);
+
+
 }

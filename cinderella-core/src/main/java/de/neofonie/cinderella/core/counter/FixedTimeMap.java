@@ -26,9 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -140,6 +138,10 @@ public class FixedTimeMap<K, V> {
         public long getEndTime() {
             return endTime.longValue();
         }
+    }
+
+    public void remove(K key) {
+        map.remove(key);
     }
 
     public Set<Map.Entry<K, Entry<V>>> entrySet() {
