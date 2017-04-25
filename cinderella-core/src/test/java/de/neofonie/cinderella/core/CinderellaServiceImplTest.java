@@ -92,8 +92,11 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
         EasyMock.reset(cinderellaXmlConfigLoader);
         EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig).anyTimes();
         Rule rule = new Rule(new ArrayList<>(), "id", IdentifierType.IP, 2, 5);
+        Rule rule2 = new Rule(new ArrayList<>(), "id2", IdentifierType.IP, 2, 5);
         EasyMock.expect(cinderellaConfig.getMatches(EasyMock.anyObject(MockHttpServletRequest.class)))
                 .andReturn(Arrays.asList(rule)).anyTimes();
+        EasyMock.expect(cinderellaConfig.getRules())
+                .andReturn(Arrays.asList(rule, rule2)).anyTimes();
         EasyMock.expect(cinderellaConfig.getWhitelistMinutes()).andReturn(1L).atLeastOnce();
 
         EasyMock.replay(cinderellaConfig, cinderellaXmlConfigLoader);
