@@ -66,6 +66,24 @@ public class MemoryCounterTest {
     }
 
     @Test
+    public void testGetBlacklist() throws Exception {
+        final String KEY = "testBlacklist";
+
+        assertEquals(0, memoryCounter.getBlacklistedRequestCount(KEY));
+        assertEquals(false, memoryCounter.isWhitelisted(KEY));
+        memoryCounter.blacklist(KEY, TimeUnit.SECONDS, 1L);
+
+        assertEquals(1, memoryCounter.getBlacklistedRequestCount(KEY));
+        assertEquals(false, memoryCounter.isBlacklisted("foo"));
+        assertEquals(true, memoryCounter.isBlacklisted(KEY));
+        assertEquals(false, memoryCounter.isWhitelisted(KEY));
+
+        doWait();
+        assertEquals(false, memoryCounter.isBlacklisted(KEY));
+        assertEquals(0, memoryCounter.getBlacklistedRequestCount(KEY));
+    }
+
+    @Test
     public void testWhitelist() throws Exception {
         final String KEY = "testWhitelist";
 

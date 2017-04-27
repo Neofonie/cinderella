@@ -30,6 +30,8 @@ public interface Counter {
 
     long incrementAndGetBlacklistedRequestCount(String key);
 
+    long getBlacklistedRequestCount(String key);
+
     /**
      * Sets a key as whitelist for the given duration
      */

@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class CinderellaServiceImpl implements CinderellaService {
 
@@ -54,33 +55,51 @@ public class CinderellaServiceImpl implements CinderellaService {
         if (cinderellaConfig == null) {
             return ActionEnum.NO_DDOS;
         }
-        final long blacklistCount = getBlacklistCount(request);
+
+        long blacklistCount = getBlacklistCount(request);
+
         if (blacklistCount > 0L) {
+            if (isDDOS(request, this::incrementBlacklistCount)) {
+                blacklistCount = getBlacklistCount(request);
+            }
             final long noResponseThreshould = cinderellaConfig.getNoResponseThreshould();
             if (noResponseThreshould > 0L && blacklistCount >= noResponseThreshould) {
-                logger.debug(String.format("%s blacklisted (%d)", clientIpAddr, blacklistCount));
+                logger.debug(String.format("%s blacklisted (%d) and no response", clientIpAddr, blacklistCount));
                 return ActionEnum.NO_RESPONSE;
             } else {
                 logger.debug(String.format("%s blacklisted (%d)", clientIpAddr, blacklistCount));
                 return ActionEnum.DDOS;
             }
         }
+        if (isDDOS(request, this::blacklist)) {
+            return ActionEnum.DDOS;
+        }
+        return ActionEnum.NO_DDOS;
+    }
+
+    protected boolean isDDOS(HttpServletRequest request, Consumer<HttpServletRequest> action) {
+        CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
         List<Rule> matches = cinderellaConfig.getMatches(request);
         for (Rule rule : matches) {
             String key = rule.getRuleKey(request);
             long count = counter.incrementAndGetNormalRequestCount(key, TimeUnit.MINUTES, rule.getMinutes());
             boolean ddos = count >= rule.getRequests();
             if (ddos) {
-                blacklist(cinderellaConfig, rule, request);
-                return ActionEnum.DDOS;
+                action.accept(request);
+                return true;
             }
         }
-        return ActionEnum.NO_DDOS;
+        return false;
     }
 
-    protected void blacklist(CinderellaConfig cinderellaConfig, Rule rule, HttpServletRequest request) {
-        final String identifier = rule.getIdentifierType().getIdentifier(request);
-        counter.blacklist(identifier, TimeUnit.MINUTES, cinderellaConfig.getBlacklistMinutes());
+    protected void blacklist(HttpServletRequest request) {
+        CinderellaConfig cinderellaConfig = cinderellaXmlConfigLoader.getCinderellaConfig();
+        List<Rule> matches = cinderellaConfig.getMatches(request);
+        for (Rule rule : matches) {
+            final String identifier = rule.getIdentifierType().getIdentifier(request);
+            counter.blacklist(identifier, TimeUnit.MINUTES, cinderellaConfig.getBlacklistMinutes());
+            break;
+        }
     }
 
     protected boolean isWhitelisted(HttpServletRequest request) {
@@ -93,12 +112,21 @@ public class CinderellaServiceImpl implements CinderellaService {
         return false;
     }
 
+    protected void incrementBlacklistCount(HttpServletRequest request) {
+        for (IdentifierType identifierType : IdentifierType.values()) {
+            if (identifierType.accept(request)) {
+                String key = identifierType.getIdentifier(request);
+                counter.incrementAndGetBlacklistedRequestCount(key);
+            }
+        }
+    }
+
     protected long getBlacklistCount(HttpServletRequest request) {
         long result = 0L;
         for (IdentifierType identifierType : IdentifierType.values()) {
             if (identifierType.accept(request)) {
                 String key = identifierType.getIdentifier(request);
-                final long count = counter.incrementAndGetBlacklistedRequestCount(key);
+                final long count = counter.getBlacklistedRequestCount(key);
                 if (count > result) {
                     result = count;
                 }
@@ -113,7 +141,7 @@ public class CinderellaServiceImpl implements CinderellaService {
             return;
         }
         List<Rule> matches = cinderellaConfig.getRules();
-        for(IdentifierType identifierType : IdentifierType.values()) {
+        for (IdentifierType identifierType : IdentifierType.values()) {
             counter.resetBlacklistCount(identifierType.getIdentifier(request));
         }
         for (Rule rule : matches) {
