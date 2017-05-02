@@ -42,7 +42,7 @@ public class MemoryCounter implements Counter {
 
     @Override
     public void blacklist(String key, TimeUnit timeUnit, long duration) {
-        blacklistMap.getOrCreate(key, s -> new AtomicLong(), timeUnit, duration);
+        blacklistMap.getOrCreate(key, s -> new AtomicLong(1), timeUnit, duration);
     }
 
     @Override
@@ -68,6 +68,16 @@ public class MemoryCounter implements Counter {
         }
 
         return counterData.incrementAndGet();
+    }
+
+    @Override
+    public long getBlacklistedRequestCount(String key) {
+        final AtomicLong counterData = blacklistMap.get(key);
+        if (counterData == null) {
+            return 0L;
+        }
+
+        return counterData.get();
     }
 
     @Override

@@ -153,6 +153,11 @@ public class CinderellaServiceImplTest extends AbstractTestNGSpringContextTests 
         }
 
         @Override
+        public long getBlacklistedRequestCount(String key) {
+            return 0;
+        }
+
+        @Override
         public void whitelist(String key, TimeUnit timeUnit, long duration) {
             whitelist = key;
         }

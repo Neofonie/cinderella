@@ -81,10 +81,14 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
 
         //Init
         EasyMock.expect(counter.isWhitelisted("SESSION_ID")).andReturn(false);
-        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig);
+        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig).times(2);
+        EasyMock.expect(counter.getBlacklistedRequestCount("SESSION_ID")).andReturn(10L).times(2);
+        EasyMock.expect(counter.getBlacklistedRequestCount("127.0.0.1")).andReturn(0L).times(2);
+        EasyMock.expect(cinderellaConfig.getNoResponseThreshould()).andReturn(0L);
+        EasyMock.expect(cinderellaConfig.getMatches(request)).andReturn(Arrays.asList(rule));
+        EasyMock.expect(counter.incrementAndGetNormalRequestCount("127.0.0.1_id", TimeUnit.MINUTES, 5)).andReturn(10L);
         EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("SESSION_ID")).andReturn(10L);
         EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
-        EasyMock.expect(cinderellaConfig.getNoResponseThreshould()).andReturn(0L);
 
         //Test
         EasyMock.replay(cinderellaConfig, cinderellaXmlConfigLoader, counter);
@@ -102,10 +106,15 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
 
         //Init
         EasyMock.expect(counter.isWhitelisted("SESSION_ID")).andReturn(false);
-        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig);
+        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig).times(2);
+        EasyMock.expect(counter.getBlacklistedRequestCount("SESSION_ID")).andReturn(0L).times(2);
+        EasyMock.expect(counter.getBlacklistedRequestCount("127.0.0.1")).andReturn(10L).times(2);
+        EasyMock.expect(cinderellaConfig.getNoResponseThreshould()).andReturn(0L);
+        EasyMock.expect(cinderellaConfig.getMatches(request)).andReturn(Arrays.asList(rule));
+        EasyMock.expect(counter.incrementAndGetNormalRequestCount("127.0.0.1_id", TimeUnit.MINUTES, 5)).andReturn(10L);
         EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
         EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("127.0.0.1")).andReturn(10L);
-        EasyMock.expect(cinderellaConfig.getNoResponseThreshould()).andReturn(0L);
+
 
         //Test
         EasyMock.replay(cinderellaConfig, cinderellaXmlConfigLoader, counter);
@@ -123,8 +132,6 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
         //Init
         EasyMock.expect(counter.isWhitelisted("SESSION_ID")).andReturn(false);
         EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(null);
-//        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
-//        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
 
         //Test
         EasyMock.replay(cinderellaConfig, cinderellaXmlConfigLoader, counter);
@@ -132,25 +139,6 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
         EasyMock.verify(cinderellaConfig, cinderellaXmlConfigLoader, counter);
         EasyMock.reset(cinderellaConfig, cinderellaXmlConfigLoader, counter);
     }
-
-//    @Test
-//    public void testConfigException() throws Exception {
-//
-//        CinderellaConfig cinderellaConfig = EasyMock.createMock(CinderellaConfig.class);
-//        MockHttpServletRequest request = createMockHttpServletRequest();
-//
-//        //Init
-//        EasyMock.expect(counter.isWhitelisted("SESSION_ID")).andReturn(false);
-//        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andThrow(new IOException());
-//        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
-//        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
-//
-//        //Test
-//        EasyMock.replay(cinderellaConfig, cinderellaXmlConfigLoader, counter);
-//        assertEquals(ActionEnum.NO_DDOS, ddosService.getAction(request));
-//        EasyMock.verify(cinderellaConfig, cinderellaXmlConfigLoader, counter);
-//        EasyMock.reset(cinderellaConfig, cinderellaXmlConfigLoader, counter);
-//    }
 
     @Test
     public void testNoMatch() throws Exception {
@@ -160,9 +148,9 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
 
         //Init
         EasyMock.expect(counter.isWhitelisted("SESSION_ID")).andReturn(false);
-        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig);
-        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
-        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
+        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig).times(2);
+        EasyMock.expect(counter.getBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
+        EasyMock.expect(counter.getBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
         EasyMock.expect(cinderellaConfig.getMatches(request)).andReturn(Collections.emptyList());
 
         //Test
@@ -181,9 +169,9 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
 
         //Init
         EasyMock.expect(counter.isWhitelisted("SESSION_ID")).andReturn(false);
-        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig);
-        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
-        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
+        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig).times(2);
+        EasyMock.expect(counter.getBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
+        EasyMock.expect(counter.getBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
         EasyMock.expect(cinderellaConfig.getMatches(request)).andReturn(Arrays.asList(rule));
         EasyMock.expect(counter.incrementAndGetNormalRequestCount("127.0.0.1_id", TimeUnit.MINUTES, 5)).andReturn(1L);
 
@@ -204,10 +192,10 @@ public class CinderellaServiceImplTest2 extends AbstractTestNGSpringContextTests
         EasyMock.expect(cinderellaConfig.getBlacklistMinutes()).andReturn(1L);
 
         EasyMock.expect(counter.isWhitelisted("SESSION_ID")).andReturn(false);
-        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig);
-        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
-        EasyMock.expect(counter.incrementAndGetBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
-        EasyMock.expect(cinderellaConfig.getMatches(request)).andReturn(Arrays.asList(rule));
+        EasyMock.expect(cinderellaXmlConfigLoader.getCinderellaConfig()).andReturn(cinderellaConfig).times(3);
+        EasyMock.expect(counter.getBlacklistedRequestCount("SESSION_ID")).andReturn(0L);
+        EasyMock.expect(counter.getBlacklistedRequestCount("127.0.0.1")).andReturn(0L);
+        EasyMock.expect(cinderellaConfig.getMatches(request)).andReturn(Arrays.asList(rule)).times(2);
         EasyMock.expect(counter.incrementAndGetNormalRequestCount("127.0.0.1_id", TimeUnit.MINUTES, 5)).andReturn(2L);
         counter.blacklist("127.0.0.1", TimeUnit.MINUTES, 1L);
 
